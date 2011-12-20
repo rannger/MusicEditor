@@ -129,7 +129,9 @@ SOURCES += main.cpp\
     lame/mpglib/dct64_i386.c \
     lame/mpglib/layer3_.c \
     lame/mpglib/common_.c \
-    lame/version_.c
+    lame/version_.c \
+    config.cpp \
+    methread.cpp
 
 
 
@@ -140,7 +142,6 @@ HEADERS  += mainwindow.h \
     libsndfile/sfconfig.h \
     libsndfile/sf_unistd.h \
     libsndfile/float_cast.h \
-    libsndfile/config.h \
     libsndfile/common.h \
     libsndfile/GSM610/gsm.h \
     libsndfile/GSM610/gsm610_priv.h \
@@ -159,7 +160,6 @@ HEADERS  += mainwindow.h \
     libmad/frame.h \
     libmad/fixed.h \
     libmad/decoder.h \
-    libmad/config.h \
     libmad/bit.h \
     lame/VbrTag.h \
     lame/vbrquantize.h \
@@ -196,7 +196,9 @@ HEADERS  += mainwindow.h \
     lame/mpglib/decode_i386.h \
     lame/mpglib/dct64_i386.h \
     lame/mpglib/common.h \
-    lame/version.h
+    lame/version.h \
+    config.h \
+    methread.h
 
 
 FORMS    +=
@@ -207,6 +209,12 @@ OTHER_FILES += \
     libmad/qc_table.dat \
     libmad/imdct_s.dat \
     libmad/D.dat
+
+
+
+
+
+
 
 
 

@@ -1,7 +1,9 @@
 #include <QtGui>
 #include "sndfile.h"
+#include "libmad/mad.h"
 #include "mainwindow.h"
-
+#include "config.h"
+#include "methread.h"
 //![0]
 MainWindow::MainWindow()
 {
@@ -29,6 +31,8 @@ MainWindow::MainWindow()
     setupActions();
     setupMenus();
     setupUi();
+    thread=new METhread(this);
+    thread->setThreadParam(musicTable);
     timeLcd->display("00:00");
 }
 
@@ -45,21 +49,7 @@ void MainWindow::addFiles()
     foreach (QString string, files) {
             Phonon::MediaSource source(string);
 
-            SNDFILE *sndfile=NULL;
-            SF_INFO info;
-            memset(&info,0,sizeof(info));
 
-            sndfile=sf_open(string.toStdString().data(),SFM_READ,&info);
-            if(sndfile)
-            {
-                puts("open success");
-            }
-            else
-            {
-                sf_perror(sndfile);
-                puts("open fial");
-            }
-            sf_close(sndfile);
 
         sources.append(source);
     }
@@ -74,6 +64,35 @@ void MainWindow::about()
     QMessageBox::information(this, tr("About Music Player"),
         tr("The Music Player example shows how to use Phonon - the multimedia"
            " framework that comes with Qt - to create a simple music player."));
+}
+
+void MainWindow::translateMusicFormat()
+{
+//    QString fileName=musicTable->currentItem()->text();
+//    SNDFILE *sndfile=NULL;
+//    SF_INFO info;
+//    memset(&info,0,sizeof(info));
+//    char* name=OS_IS_WIN32?fileName.toAscii().data():
+//                           fileName.toUtf8().data();
+//    sndfile=sf_open(name,SFM_READ,&info);
+//    if(sndfile)
+//    {
+//        double buffer[info.channels];
+//        qDebug()<<"sizeof(size_t)="<<sizeof(size_t);
+//        sf_count_t count=0;
+//        while(count=sf_readf_double(sndfile,buffer,1))
+//        {
+//            continue;
+//        }
+
+//        qDebug()<<(info.frames*info.channels);
+//        qDebug()<<sf_format_check(&info)<<",";
+//    }
+
+//    qDebug()<<sf_strerror(sndfile)<<fileName;
+//    sf_close(sndfile);
+    if(!thread->isRunning())
+        thread->start();
 }
 
 //![9]
@@ -106,12 +125,24 @@ void MainWindow::stateChanged(Phonon::State newState, Phonon::State /* oldState 
                 pauseAction->setEnabled(false);
                 stopAction->setEnabled(true);
                 playAction->setEnabled(true);
+;
                 break;
 //![10]
         case Phonon::BufferingState:
                 break;
         default:
+
             ;
+    }
+    if(musicTable->columnCount())
+    {
+        nextAction->setEnabled(true);
+        previousAction->setEnabled(true);
+    }
+    else
+    {
+        nextAction->setEnabled(false);
+        previousAction->setEnabled(false);
     }
 }
 
@@ -171,28 +202,27 @@ void MainWindow::metaStateChanged(Phonon::State newState, Phonon::State /* oldSt
 
     QMap<QString, QString> metaData = metaInformationResolver->metaData();
 
-    QString title = metaData.value("TITLE");
-    if (title == "")
-        title = metaInformationResolver->currentSource().fileName();
+    QString title = metaData.value(tr("TITLE"));
+    QTableWidgetItem *titleItem = NULL;
+    titleItem=new QTableWidgetItem(metaInformationResolver->currentSource().fileName());
 
-    QTableWidgetItem *titleItem = new QTableWidgetItem(title);
     titleItem->setFlags(titleItem->flags() ^ Qt::ItemIsEditable);
-    QTableWidgetItem *artistItem = new QTableWidgetItem(metaData.value("ARTIST"));
-    artistItem->setFlags(artistItem->flags() ^ Qt::ItemIsEditable);
-    QTableWidgetItem *albumItem = new QTableWidgetItem(metaData.value("ALBUM"));
-    albumItem->setFlags(albumItem->flags() ^ Qt::ItemIsEditable);
-    QTableWidgetItem *yearItem = new QTableWidgetItem(metaData.value("DATE"));
-    yearItem->setFlags(yearItem->flags() ^ Qt::ItemIsEditable);
-//![14]
+
+//    QTableWidgetItem *artistItem = new QTableWidgetItem(metaData.value("ARTIST"));
+//    artistItem->setFlags(artistItem->flags() ^ Qt::ItemIsEditable);
+//    QTableWidgetItem *albumItem = new QTableWidgetItem(metaData.value("ALBUM"));
+//    albumItem->setFlags(albumItem->flags() ^ Qt::ItemIsEditable);
+//    QTableWidgetItem *yearItem = new QTableWidgetItem(metaData.value("DATE"));
+//    yearItem->setFlags(yearItem->flags() ^ Qt::ItemIsEditable);
 
     int currentRow = musicTable->rowCount();
     musicTable->insertRow(currentRow);
     musicTable->setItem(currentRow, 0, titleItem);
-    musicTable->setItem(currentRow, 1, artistItem);
-    musicTable->setItem(currentRow, 2, albumItem);
-    musicTable->setItem(currentRow, 3, yearItem);
+//    musicTable->setItem(currentRow, 1, artistItem);
+//    musicTable->setItem(currentRow, 2, albumItem);
+//    musicTable->setItem(currentRow, 3, yearItem);
 
-//![15]
+
     if (musicTable->selectedItems().isEmpty()) {
         musicTable->selectRow(0);
         mediaObject->setCurrentSource(metaInformationResolver->currentSource());
@@ -234,8 +264,10 @@ void MainWindow::setupActions()
     stopAction->setDisabled(true);
     nextAction = new QAction(style()->standardIcon(QStyle::SP_MediaSkipForward), tr("Next"), this);
     nextAction->setShortcut(tr("Ctrl+N"));
+    nextAction->setDisabled(true);
     previousAction = new QAction(style()->standardIcon(QStyle::SP_MediaSkipBackward), tr("Previous"), this);
     previousAction->setShortcut(tr("Ctrl+R"));
+    previousAction->setDisabled(true);
     addFilesAction = new QAction(tr("Add &Files"), this);
     addFilesAction->setShortcut(tr("Ctrl+F"));
     exitAction = new QAction(tr("E&xit"), this);
@@ -244,6 +276,7 @@ void MainWindow::setupActions()
     aboutAction->setShortcut(tr("Ctrl+B"));
     aboutQtAction = new QAction(tr("About &Qt"), this);
     aboutQtAction->setShortcut(tr("Ctrl+Q"));
+    translateAction = new QAction(tr("Translate Music Format"),this);
 
 //![5]
     connect(playAction, SIGNAL(triggered()), mediaObject, SLOT(play()));
@@ -254,6 +287,7 @@ void MainWindow::setupActions()
     connect(exitAction, SIGNAL(triggered()), this, SLOT(close()));
     connect(aboutAction, SIGNAL(triggered()), this, SLOT(about()));
     connect(aboutQtAction, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
+    connect(translateAction, SIGNAL(triggered()), this, SLOT(translateMusicFormat()));
 }
 
 void MainWindow::setupMenus()
@@ -262,6 +296,8 @@ void MainWindow::setupMenus()
     fileMenu->addAction(addFilesAction);
     fileMenu->addSeparator();
     fileMenu->addAction(exitAction);
+    QMenu* translateMenu=menuBar()->addMenu(tr("&Translate"));
+    translateMenu->addAction(translateAction);
 
     QMenu *aboutMenu = menuBar()->addMenu(tr("&Help"));
     aboutMenu->addAction(aboutAction);
@@ -273,10 +309,11 @@ void MainWindow::setupUi()
 {
 //![3]
     QToolBar *bar = new QToolBar;
-
+    bar->addAction(previousAction);
     bar->addAction(playAction);
     bar->addAction(pauseAction);
-    bar->addAction(stopAction);
+    bar->addAction(stopAction);   
+    bar->addAction(nextAction);
 
 //![4]
     seekSlider = new Phonon::SeekSlider(this);
@@ -297,9 +334,9 @@ void MainWindow::setupUi()
     timeLcd->setPalette(palette);
 
     QStringList headers;
-    headers << tr("Title") << tr("Artist") << tr("Album") << tr("Year");
-
-    musicTable = new QTableWidget(0, 4);
+//    headers << tr("Title") << tr("Artist") << tr("Album") << tr("Year");
+    headers<<tr("file name");
+    musicTable = new QTableWidget(0, 1);
     musicTable->setHorizontalHeaderLabels(headers);
     musicTable->setSelectionMode(QAbstractItemView::SingleSelection);
     musicTable->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -325,7 +362,7 @@ void MainWindow::setupUi()
     widget->setLayout(mainLayout);
 
     setCentralWidget(widget);
-    setWindowTitle("Phonon Music Player");
+    setWindowTitle("Music Editor");
 }
 
 

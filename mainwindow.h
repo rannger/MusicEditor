@@ -15,6 +15,7 @@ class QTableWidget;
 class QLCDNumber;
 QT_END_NAMESPACE
 
+class METhread;
 //![0]
 
 class MainWindow : public QMainWindow
@@ -32,6 +33,7 @@ public:
 private slots:
     void addFiles();
     void about();
+    void translateMusicFormat();
 //![1]
     void stateChanged(Phonon::State newState, Phonon::State oldState);
     void tick(qint64 time);
@@ -61,11 +63,13 @@ private:
     QAction *nextAction;
     QAction *previousAction;
     QAction *addFilesAction;
+    QAction *translateAction;
     QAction *exitAction;
     QAction *aboutAction;
     QAction *aboutQtAction;
     QLCDNumber *timeLcd;
     QTableWidget *musicTable;
+    METhread* thread;
 };
 
 #endif

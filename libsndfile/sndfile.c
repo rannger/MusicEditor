@@ -257,7 +257,7 @@ static char	sf_syserr [SF_SYSERR_LEN] = { 0 } ;
 
 #define	VALIDATE_SNDFILE_AND_ASSIGN_PSF(a,b,c)		\
 		{	if (! (a))								\
-			{	sf_errno = SFE_BAD_SNDFILE_PTR ;	\
+                        {	sf_errno = SFE_BAD_SNDFILE_PTR ;	\
 				return 0 ;							\
 				} ;									\
 			(b) = (SF_PRIVATE*) (a) ;				\
@@ -488,7 +488,7 @@ sf_error (SNDFILE *sndfile)
 {	SF_PRIVATE	*psf ;
 
 	if (! sndfile)
-	{	if (sf_error != 0)
+        {	if (sf_errno != 0)
 			return sf_errno ;
 		return 0 ;
         } ;

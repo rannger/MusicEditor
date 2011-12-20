@@ -1,6 +1,6 @@
 #ifndef CONFIG_H
 #define CONFIG_H
-
+#include <_mingw.h>
 /* Define to enable diagnostic debugging support. */
 /* #undef DEBUG */
 
@@ -166,8 +166,12 @@
 #define OS_IS_MACOSX 0
 
 /* Set to 1 if compiling for Win32 */
-#define OS_IS_WIN32 1
 
+#ifdef __MINGW_H
+#define OS_IS_WIN32 1
+#else
+#define OS_IS_WIN32 0
+#endif
 
 
 /* Set to maximum allowed value of sf_count_t type. */
@@ -195,7 +199,7 @@
 #define SIZEOF_OFF_T 4
 
 /* Set to sizeof (long) if unknown. */
-#define SIZEOF_SF_COUNT_T 8
+#define SIZEOF_SF_COUNT_T (8)
 
 /* The size of a `short', as computed by sizeof. */
 #define SIZEOF_SHORT (sizeof(short))
@@ -216,9 +220,12 @@
 #define TYPEOF_SF_COUNT_T __int64
 
 /* Set to 1 to use the native windows API */
+
+#ifdef __MINGW_H
 #define USE_WINDOWS_API 1
-
-
+#else
+#define USE_WINDOWS_API 0
+#endif
 
 
 /* Define to 1 if you have the `pipe' function. */
