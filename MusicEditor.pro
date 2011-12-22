@@ -131,7 +131,8 @@ SOURCES += main.cpp\
     lame/mpglib/common_.c \
     lame/version_.c \
     config.cpp \
-    methread.cpp
+    methread.cpp \
+    madfunction.cpp
 
 
 
@@ -198,7 +199,8 @@ HEADERS  += mainwindow.h \
     lame/mpglib/common.h \
     lame/version.h \
     config.h \
-    methread.h
+    methread.h \
+    madfunction.h
 
 
 FORMS    +=
@@ -209,6 +211,8 @@ OTHER_FILES += \
     libmad/qc_table.dat \
     libmad/imdct_s.dat \
     libmad/D.dat
+
+
 
 
 

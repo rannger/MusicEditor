@@ -16,7 +16,9 @@ signals:
 
 public slots:
 
-
+private:
+    void wav2Mp3(const QString& fileName);
+    void mp32wav(const QString& fileName);
 private:
     QObject* m_threadParament;
 };

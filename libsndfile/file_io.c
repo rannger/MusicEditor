@@ -436,19 +436,22 @@ int
 psf_is_pipe (SF_PRIVATE *psf)
 {	struct stat statbuf ;
 
-	if (psf->virtual_io)
-		return SF_FALSE ;
+        if (psf->virtual_io)
+                return SF_FALSE ;
 
-	if (fstat (psf->filedes, &statbuf) == -1)
-	{	psf_log_syserr (psf, errno) ;
-		/* Default to maximum safety. */
-		return SF_TRUE ;
-		} ;
+        if (fstat (psf->filedes, &statbuf) == -1)
+        {	psf_log_syserr (psf, errno) ;
+                /* Default to maximum safety. */
+                return SF_TRUE ;
+                } ;
+#ifdef S_ISFIFO
+#ifdef S_ISSOCK
+        if (S_ISFIFO (statbuf.st_mode) || S_ISSOCK (statbuf.st_mode))
+                return SF_TRUE ;
+#endif
+#endif
 
-	if (S_ISFIFO (statbuf.st_mode) || S_ISSOCK (statbuf.st_mode))
-		return SF_TRUE ;
-
-	return SF_FALSE ;
+        return SF_FALSE ;
 } /* psf_is_pipe */
 
 static sf_count_t
@@ -772,19 +775,20 @@ psf_open_handle (const char * pathname, int open_mode)
 				return NULL ;
 		} ;
 
-        handle = CreateFileA (
-			pathname,					/* pointer to name of the file */
-			dwDesiredAccess,			/* access (read-write) mode */
-			dwShareMode,				/* share mode */
-			0,							/* pointer to security attributes */
-			dwCreationDistribution,		/* how to create */
-			FILE_ATTRIBUTE_NORMAL,		/* file attributes (could use FILE_FLAG_SEQUENTIAL_SCAN) */
-			NULL						/* handle to file with attributes to copy */
-			) ;
+                handle = CreateFileA (
+                                pathname,					/* pointer to name of the file */
+                                dwDesiredAccess,			/* access (read-write) mode */
+                                dwShareMode,				/* share mode */
+                                0,							/* pointer to security attributes */
+                                dwCreationDistribution,		/* how to create */
+                                FILE_ATTRIBUTE_NORMAL,		/* file attributes (could use FILE_FLAG_SEQUENTIAL_SCAN) */
+                                NULL						/* handle to file with attributes to copy */
+                                ) ;
 
 	if (handle == INVALID_HANDLE_VALUE)
         {
-		return NULL ;
+                printf("%d",GetLastError());
+                return NULL;
         }
 
 	return handle ;

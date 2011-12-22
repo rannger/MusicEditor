@@ -250,10 +250,11 @@ typedef	struct SNDFILE_tag	SNDFILE ;
 ** off64_t (Solaris), __int64_t (Win32) etc.
 */
 
-typedef __int64	sf_count_t ;
+//typedef __int64	sf_count_t ;
+typedef long sf_count_t;
 
-#define SF_COUNT_MAX		0x7FFFFFFFFFFFFFFFLL
-
+//#define SF_COUNT_MAX		0x7FFFFFFFFFFFFFFFLL
+#define SF_COUNT_MAX 0x7FFFFFFF
 /* A pointer to a SF_INFO structure is passed to sf_open_read () and filled in.
 ** On write, the SF_INFO structure is filled in by the user and passed into
 ** sf_open_write ().

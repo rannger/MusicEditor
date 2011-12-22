@@ -7,6 +7,7 @@
 /* Define to enable experimental code. */
 /* #undef EXPERIMENTAL */
 /* Set to 1 if the compile is GNU GCC. */
+
 #define COMPILER_IS_GCC 1
 
 /* Target processor clips on negative float to int conversion. */
@@ -196,10 +197,10 @@
 /* #undef SIZEOF_OFF64_T */
 
 /* The size of a `off_t', as computed by sizeof. */
-#define SIZEOF_OFF_T 4
+#define SIZEOF_OFF_T (4)
 
 /* Set to sizeof (long) if unknown. */
-#define SIZEOF_SF_COUNT_T (8)
+#define SIZEOF_SF_COUNT_T (4)
 
 /* The size of a `short', as computed by sizeof. */
 #define SIZEOF_SHORT (sizeof(short))
@@ -221,12 +222,12 @@
 
 /* Set to 1 to use the native windows API */
 
-#ifdef __MINGW_H
-#define USE_WINDOWS_API 1
-#else
-#define USE_WINDOWS_API 0
-#endif
+//#ifdef __MINGW_H
 
+//#else
+//#define USE_WINDOWS_API 0
+//#endif
+#define USE_WINDOWS_API 0
 
 /* Define to 1 if you have the `pipe' function. */
 /* #undef HAVE_PIPE */
@@ -235,22 +236,22 @@
 /* #undef HAVE_SYS_WAIT_H */
 
 /* Name of package */
-#define PACKAGE "libmad"
+#define PACKAGE "musiceditor"
 
 /* Define to the address where bug reports for this package should be sent. */
 #define PACKAGE_BUGREPORT "support@underbit.com"
 
 /* Define to the full name of this package. */
-#define PACKAGE_NAME "MPEG Audio Decoder"
+#define PACKAGE_NAME "Music Editor"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "MPEG Audio Decoder 0.15.1b"
+#define PACKAGE_STRING "Music Editor 0.1"
 
 /* Define to the one symbol short name of this package. */
-#define PACKAGE_TARNAME "libmad"
+#define PACKAGE_TARNAME "musiceditor"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "0.15.1b"
+#define PACKAGE_VERSION "0.1"
 
 ///* The size of a `int', as computed by sizeof. */
 //#define SIZEOF_INT (sizeof(int))

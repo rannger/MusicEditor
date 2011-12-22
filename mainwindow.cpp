@@ -1,6 +1,6 @@
 #include <QtGui>
 #include "sndfile.h"
-#include "libmad/mad.h"
+#include "madfunction.h"
 #include "mainwindow.h"
 #include "config.h"
 #include "methread.h"
@@ -48,10 +48,7 @@ void MainWindow::addFiles()
     int index = sources.size();
     foreach (QString string, files) {
             Phonon::MediaSource source(string);
-
-
-
-        sources.append(source);
+            sources.append(source);
     }
     if (!sources.isEmpty())
         metaInformationResolver->setCurrentSource(sources.at(index));
@@ -92,7 +89,10 @@ void MainWindow::translateMusicFormat()
 //    qDebug()<<sf_strerror(sndfile)<<fileName;
 //    sf_close(sndfile);
     if(!thread->isRunning())
+    {
+        thread->setThreadParam(musicTable);
         thread->start();
+    }
 }
 
 //![9]
@@ -236,7 +236,7 @@ void MainWindow::metaStateChanged(Phonon::State newState, Phonon::State /* oldSt
     else {
         musicTable->resizeColumnsToContents();
         if (musicTable->columnWidth(0) > 300)
-            musicTable->setColumnWidth(0, 300);
+            musicTable->setColumnWidth(0, 1000);
     }
 }
 //![15]
@@ -276,7 +276,7 @@ void MainWindow::setupActions()
     aboutAction->setShortcut(tr("Ctrl+B"));
     aboutQtAction = new QAction(tr("About &Qt"), this);
     aboutQtAction->setShortcut(tr("Ctrl+Q"));
-    translateAction = new QAction(tr("Translate Music Format"),this);
+    translateAction = new QAction(style()->standardIcon(QStyle::SP_DirClosedIcon),tr("Wav to mp3"),this);
 
 //![5]
     connect(playAction, SIGNAL(triggered()), mediaObject, SLOT(play()));
@@ -296,8 +296,8 @@ void MainWindow::setupMenus()
     fileMenu->addAction(addFilesAction);
     fileMenu->addSeparator();
     fileMenu->addAction(exitAction);
-    QMenu* translateMenu=menuBar()->addMenu(tr("&Translate"));
-    translateMenu->addAction(translateAction);
+//    QMenu* translateMenu=menuBar()->addMenu(tr("&Translate"));
+//    translateMenu->addAction(translateAction);
 
     QMenu *aboutMenu = menuBar()->addMenu(tr("&Help"));
     aboutMenu->addAction(aboutAction);
@@ -314,6 +314,7 @@ void MainWindow::setupUi()
     bar->addAction(pauseAction);
     bar->addAction(stopAction);   
     bar->addAction(nextAction);
+    bar->addAction(translateAction);
 
 //![4]
     seekSlider = new Phonon::SeekSlider(this);
