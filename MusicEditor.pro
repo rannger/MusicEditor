@@ -213,101 +213,32 @@ OTHER_FILES += \
     libmad/D.dat
 
 
+win32: LIBS += -L$$PWD/FFmpeg-full-SDK-3.2/lib/ -lavcodec
 
+INCLUDEPATH += $$PWD/FFmpeg-full-SDK-3.2/include
+DEPENDPATH += $$PWD/FFmpeg-full-SDK-3.2/include
 
+win32: LIBS += -L$$PWD/FFmpeg-full-SDK-3.2/lib/ -lavdevice
 
+INCLUDEPATH += $$PWD/FFmpeg-full-SDK-3.2/include
+DEPENDPATH += $$PWD/FFmpeg-full-SDK-3.2/include
 
+win32: LIBS += -L$$PWD/FFmpeg-full-SDK-3.2/lib/ -lavfilter
 
+INCLUDEPATH += $$PWD/FFmpeg-full-SDK-3.2/include
+DEPENDPATH += $$PWD/FFmpeg-full-SDK-3.2/include
 
+win32: LIBS += -L$$PWD/FFmpeg-full-SDK-3.2/lib/ -lavformat
 
+INCLUDEPATH += $$PWD/FFmpeg-full-SDK-3.2/include
+DEPENDPATH += $$PWD/FFmpeg-full-SDK-3.2/include
 
+win32: LIBS += -L$$PWD/FFmpeg-full-SDK-3.2/lib/ -lavutil
 
+INCLUDEPATH += $$PWD/FFmpeg-full-SDK-3.2/include
+DEPENDPATH += $$PWD/FFmpeg-full-SDK-3.2/include
 
+win32: LIBS += -L$$PWD/FFmpeg-full-SDK-3.2/lib/ -lswscale
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+INCLUDEPATH += $$PWD/FFmpeg-full-SDK-3.2/include
+DEPENDPATH += $$PWD/FFmpeg-full-SDK-3.2/include
