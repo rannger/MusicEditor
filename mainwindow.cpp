@@ -1,9 +1,14 @@
 #include <QtGui>
-#include "sndfile.h"
-#include "madfunction.h"
+#include "OtherClass/ffmpeg.h"
 #include "mainwindow.h"
-#include "config.h"
-#include "methread.h"
+#include "meaudiodecoder.h"
+//#include "libavformat/avformat.h"
+//#include "libavdevice/avdevice.h"
+//#include "libswscale/swscale.h"
+//#include "libavutil/fifo.h"
+//#include "libavutil/avstring.h"
+
+
 //![0]
 MainWindow::MainWindow()
 {
@@ -31,8 +36,6 @@ MainWindow::MainWindow()
     setupActions();
     setupMenus();
     setupUi();
-    thread=new METhread(this);
-    thread->setThreadParam(musicTable);
     timeLcd->display("00:00");
 }
 
@@ -88,11 +91,8 @@ void MainWindow::translateMusicFormat()
 
 //    qDebug()<<sf_strerror(sndfile)<<fileName;
 //    sf_close(sndfile);
-    if(!thread->isRunning())
-    {
-        thread->setThreadParam(musicTable);
-        thread->start();
-    }
+    MEAudioDecoder *decoder=new MEAudioDecoder();
+    qDebug()<<decoder->OpenFile(musicTable->currentItem()->text());
 }
 
 //![9]

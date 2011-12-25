@@ -15,7 +15,6 @@ class QTableWidget;
 class QLCDNumber;
 QT_END_NAMESPACE
 
-class METhread;
 //![0]
 
 class MainWindow : public QMainWindow
@@ -69,7 +68,6 @@ private:
     QAction *aboutQtAction;
     QLCDNumber *timeLcd;
     QTableWidget *musicTable;
-    METhread* thread;
 };
 
 #endif
