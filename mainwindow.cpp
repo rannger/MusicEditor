@@ -76,6 +76,7 @@ void MainWindow::translateMusicFormat()
     encoder->encode(decoder);
     delete decoder;
     delete encoder;
+
 }
 
 //![9]

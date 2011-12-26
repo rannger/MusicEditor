@@ -79,6 +79,7 @@ int MEAuidoEncoder::OpenFile(const QString& fileName,int sampleRate,int bitRate,
     oCodecCtx->codec_type = CODEC_TYPE_AUDIO;
     oCodecCtx->sample_rate = sampleRate;
     oCodecCtx->bit_rate = bitRate;
+    oCodecCtx->bit_rate_tolerance=bitRate;
     oCodecCtx->channels = channels;
 //    qDebug()<<"sampleRate:"<<sampleRate;
 //    qDebug()<<"bitRate:"<<bitRate;
@@ -128,6 +129,32 @@ int MEAuidoEncoder::encode(MEAudioDecoder* decoder)
         int retval=0;
         int i=0;
 
+        int audio_input_frame_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
+
+            /* ugly hack for PCM codecs (will be removed ASAP with new PCM
+               support to compute the input frame size in samples */
+            if (decoder->getAVCodecContext()->frame_size < 1)
+            {
+                audio_input_frame_size = out_size / decoder->getAVCodecContext()->channels;
+                switch(pInCodecCtx->codec_id)
+                {
+                case CODEC_ID_PCM_S16LE:
+                case CODEC_ID_PCM_S16BE:
+                case CODEC_ID_PCM_U16LE:
+                case CODEC_ID_PCM_U16BE:
+                    audio_input_frame_size >>= 1;
+                    qDebug()<<"here1";
+                    break;
+                default:
+                    break;
+                }
+            }
+            else
+            {
+                qDebug()<<"here2";
+                audio_input_frame_size = pInCodecCtx->frame_size * 2 * pInCodecCtx->channels;//获取Sample大小
+            }
+            inputSampleSize=audio_input_frame_size;
         av_init_packet(&packet);
         av_write_header(oFmtCtx);
 
