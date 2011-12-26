@@ -2,6 +2,7 @@
 #include "OtherClass/ffmpeg.h"
 #include "mainwindow.h"
 #include "meaudiodecoder.h"
+#include "meauidoencoder.h"
 //#include "libavformat/avformat.h"
 //#include "libavdevice/avdevice.h"
 //#include "libswscale/swscale.h"
@@ -68,31 +69,13 @@ void MainWindow::about()
 
 void MainWindow::translateMusicFormat()
 {
-//    QString fileName=musicTable->currentItem()->text();
-//    SNDFILE *sndfile=NULL;
-//    SF_INFO info;
-//    memset(&info,0,sizeof(info));
-//    char* name=OS_IS_WIN32?fileName.toAscii().data():
-//                           fileName.toUtf8().data();
-//    sndfile=sf_open(name,SFM_READ,&info);
-//    if(sndfile)
-//    {
-//        double buffer[info.channels];
-//        qDebug()<<"sizeof(size_t)="<<sizeof(size_t);
-//        sf_count_t count=0;
-//        while(count=sf_readf_double(sndfile,buffer,1))
-//        {
-//            continue;
-//        }
-
-//        qDebug()<<(info.frames*info.channels);
-//        qDebug()<<sf_format_check(&info)<<",";
-//    }
-
-//    qDebug()<<sf_strerror(sndfile)<<fileName;
-//    sf_close(sndfile);
     MEAudioDecoder *decoder=new MEAudioDecoder();
-    qDebug()<<decoder->OpenFile(musicTable->currentItem()->text());
+    MEAuidoEncoder *encoder=new MEAuidoEncoder();
+    qDebug()<<decoder->initWithFile(musicTable->currentItem()->text());
+    qDebug()<<encoder->OpenFile("e://out.wav",decoder->getSampleRate(),decoder->getBitRate(),decoder->getChannels());
+    encoder->encode(decoder);
+    delete decoder;
+    delete encoder;
 }
 
 //![9]

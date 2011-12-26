@@ -16,15 +16,28 @@
 
 #ifndef MEAUIDOENCODER_H
 #define MEAUIDOENCODER_H
-
+#include <QtCore>
 #include "OtherClass/ffmpeg.h"
-
+class MEAudioDecoder;
 class MEAuidoEncoder
 {
 public:
     MEAuidoEncoder();
+    ~MEAuidoEncoder();
+    int OpenFile(const QString& fileName,int sampleRate,int bitRate,int channels);
+    int init();
+    void dealloc();
+    int encode(MEAudioDecoder* decoder);
+    const AVCodecContext* getAVCodecContext();
+    const AVFormatContext* getAVFormatContext();
+    const AVCodec* getAVCodec();
 private:
+    AVFormatContext *oFmtCtx;
+    AVCodecContext *oCodecCtx;
+    AVCodec *pOutCodec;
 
+    AVOutputFormat * oFormat;
+    AVStream *oStream;
 };
 
 #endif // MEAUIDOENCODER_H

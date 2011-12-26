@@ -24,17 +24,25 @@ class MEAudioDecoder
 public:
     MEAudioDecoder();
     virtual ~MEAudioDecoder();
-    virtual int OpenFile(const QString& fileName);
-
+    virtual int initWithFile(const QString& fileName);
+    virtual int init();
+    virtual void dealloc();
+    int readFrame(AVPacket &packet);
+    AVCodecContext* getAVCodecContext();
+    AVFormatContext* getAVFormatContext();
+    AVCodec* getAVCodec();
+    int getSampleRate();
+    int getBitRate();
+    int getChannels();
+    int getAudioStream();
 private:
-    AVFormatContext *pFormatCtx;
-    AVCodecContext  *pCodecCtx;
-    AVCodec         *pCodec;
-    AVFrame         *pFrame;
-    AVPacket        packet;
-    AVCodecContext  *aCodecCtx;
-    AVCodec         *aCodec;
-
+    AVFormatContext *pInFmtCtx;
+    AVCodecContext *pInCodecCtx;
+    AVCodec *pInCodec;
+    int sampleRate;
+    int bitRate;
+    int channels;
+    int audioStreamIndex;
 };
 
 #endif // MEAUDIODECODER_H
