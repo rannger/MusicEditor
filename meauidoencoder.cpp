@@ -79,7 +79,6 @@ int MEAuidoEncoder::OpenFile(const QString& fileName,int sampleRate,int bitRate,
     oCodecCtx->codec_type = CODEC_TYPE_AUDIO;
     oCodecCtx->sample_rate = sampleRate;
     oCodecCtx->bit_rate = bitRate;
-    oCodecCtx->bit_rate_tolerance=bitRate;
     oCodecCtx->channels = channels;
 //    qDebug()<<"sampleRate:"<<sampleRate;
 //    qDebug()<<"bitRate:"<<bitRate;
@@ -153,8 +152,10 @@ int MEAuidoEncoder::encode(MEAudioDecoder* decoder)
             {
                 qDebug()<<"here2";
                 audio_input_frame_size = pInCodecCtx->frame_size * 2 * pInCodecCtx->channels;//获取Sample大小
+
             }
             inputSampleSize=audio_input_frame_size;
+            qDebug()<<"inputSampleSize:"<<inputSampleSize;
         av_init_packet(&packet);
         av_write_header(oFmtCtx);
 
@@ -165,6 +166,7 @@ int MEAuidoEncoder::encode(MEAudioDecoder* decoder)
                     {
                         pktdata = packet.data;
                         pktsize = packet.size;
+                        qDebug()<<"frame in size:"<<pktsize;
                         while (pktsize>0)
                         {
                             out_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
@@ -175,6 +177,7 @@ int MEAuidoEncoder::encode(MEAudioDecoder* decoder)
                                 retval=-1;
                                 break;
                             }
+
                             if (out_size>0)
                             {
                                 pinbuf = inbuf;
@@ -182,8 +185,9 @@ int MEAuidoEncoder::encode(MEAudioDecoder* decoder)
                                 {
                                     AVPacket pkt;
                                     av_init_packet(&pkt);
-                                    ob_size = FF_MIN_BUFFER_SIZE;
-                                    pkt.size= avcodec_encode_audio(oCodecCtx, outbuf, ob_size, (short *)pinbuf);
+//                                    ob_size = FF_MIN_BUFFER_SIZE;
+                                    pkt.size= avcodec_encode_audio(oCodecCtx, outbuf, out_size, (short *)pinbuf);
+                                    qDebug()<<"frame out size"<<pkt.size;
                                     pkt.pts= av_rescale_q(oCodecCtx->coded_frame->pts, oCodecCtx->time_base, oStream->time_base);
                                     pkt.flags |= PKT_FLAG_KEY;
                                     pkt.stream_index= oStream->index;
