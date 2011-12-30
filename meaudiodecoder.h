@@ -43,6 +43,8 @@ private:
     int bitRate;
     int channels;
     int audioStreamIndex;
+    char fileName[FILENAME_MAX];
+    int flag;
 };
 
 #endif // MEAUDIODECODER_H

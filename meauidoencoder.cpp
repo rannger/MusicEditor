@@ -24,7 +24,8 @@ MEAuidoEncoder::MEAuidoEncoder()
 
 MEAuidoEncoder::~MEAuidoEncoder()
 {
-    dealloc();
+    if(flag!=-1)
+       dealloc();
 }
 
 int MEAuidoEncoder::init()
@@ -40,27 +41,29 @@ int MEAuidoEncoder::init()
 void MEAuidoEncoder::dealloc()
 {
     int i;
-    for(i = 0; i < oFmtCtx->nb_streams; i++) {
-        av_freep(&oFmtCtx->streams[i]->codec);
-        av_freep(&oFmtCtx->streams[i]);
-    }
-    if (!(oFormat->flags & AVFMT_NOFILE)) {
-        // close the output file
-        url_fclose(oFmtCtx->pb);
-    }
-    // free the stream
-    if(oFmtCtx)
-        av_free(oFmtCtx);
+        for(i = 0; i < oFmtCtx->nb_streams; i++) {
+            av_freep(&oFmtCtx->streams[i]->codec);
+            av_freep(&oFmtCtx->streams[i]);
+        }
+        if (!(oFormat->flags & AVFMT_NOFILE)) {
+            // close the output file
+            url_fclose(oFmtCtx->pb);
+        }
+        // free the stream
+        if(oFmtCtx)
+            av_free(oFmtCtx);
 }
+
 
 int MEAuidoEncoder::OpenFile(const QString& fileName,int sampleRate,int bitRate,int channels)
 {
     char* outFile=fileName.toLocal8Bit().data();
-
+    strcat(this->fileName,outFile);
     oFormat=guess_format(NULL,outFile,NULL);
     if (oFormat==NULL)
     {
         qDebug()<<"not found output file format";
+        flag=-1;
         return -1;
     }
 
@@ -68,6 +71,7 @@ int MEAuidoEncoder::OpenFile(const QString& fileName,int sampleRate,int bitRate,
     if (oFmtCtx==NULL)
     {
             qDebug()<<"av_alloc_format_context failed";
+            flag=-1;
             return -1;
     }
 
@@ -80,6 +84,7 @@ int MEAuidoEncoder::OpenFile(const QString& fileName,int sampleRate,int bitRate,
     oCodecCtx->sample_rate = sampleRate;
     oCodecCtx->bit_rate = bitRate;
     oCodecCtx->channels = channels;
+    oCodecCtx->bit_rate_tolerance=bitRate;
 //    qDebug()<<"sampleRate:"<<sampleRate;
 //    qDebug()<<"bitRate:"<<bitRate;
 //    qDebug()<<"channels:"<<channels;
@@ -88,11 +93,13 @@ int MEAuidoEncoder::OpenFile(const QString& fileName,int sampleRate,int bitRate,
     if(avcodec_open(oCodecCtx, pOutCodec)<0)
     {
         qDebug()<<"avcodec_open failed.";
+        flag=-1;
         return -1; // Could not open codec
     }
     if (av_set_parameters(oFmtCtx, NULL) < 0)
     {
         qDebug()<<"Invalid output format parameters\n";
+        flag=-1;
         return -1;
     }
     dump_format(oFmtCtx, 0, outFile, 1);
@@ -102,6 +109,7 @@ int MEAuidoEncoder::OpenFile(const QString& fileName,int sampleRate,int bitRate,
        if (url_fopen(&oFmtCtx->pb, outFile, URL_WRONLY) < 0)
        {
            qDebug()<<"Could not open "<<outFile;
+           flag=-1;
            return -1;
        }
    }
@@ -151,15 +159,14 @@ int MEAuidoEncoder::encode(MEAudioDecoder* decoder)
             else
             {
                 qDebug()<<"here2";
-                audio_input_frame_size = pInCodecCtx->frame_size * 2 * pInCodecCtx->channels;//获取Sample大小
-
+                audio_input_frame_size = pInCodecCtx->frame_size;//获取Sample大小
             }
-            inputSampleSize=audio_input_frame_size;
+            inputSampleSize=audio_input_frame_size* 2 * pInCodecCtx->channels;
             qDebug()<<"inputSampleSize:"<<inputSampleSize;
         av_init_packet(&packet);
         av_write_header(oFmtCtx);
         AVFifoBuffer fifo;//定义缓冲
-        av_fifo_init(&fifo, AVCODEC_MAX_AUDIO_FRAME_SIZE*2);  //为该缓冲分配空间
+        av_fifo_init(&fifo, inputSampleSize);  //为该缓冲分配空间
         while(decoder->readFrame(packet)>=0)
         {
                     // Is this a packet from the audio stream?
@@ -185,10 +192,13 @@ int MEAuidoEncoder::encode(MEAudioDecoder* decoder)
                                 av_fifo_realloc(&fifo,av_fifo_size(&fifo)+out_size+1);
                                 av_fifo_write(&fifo,inbuf,out_size);
 //                                for (i=0;i<out_size;i+=inputSampleSize)
+
                                 do
                                 {
                                     uint8_t* pSample=(uint8_t*)av_mallocz(inputSampleSize);
+                                    memset(pSample,0,inputSampleSize);
                                     av_fifo_read(&fifo,pSample,out_size);
+
                                     pinbuf=pSample;
                                     AVPacket pkt;
                                     av_init_packet(&pkt);
@@ -201,7 +211,7 @@ int MEAuidoEncoder::encode(MEAudioDecoder* decoder)
                                     pkt.stream_index= oStream->index;
                                     pkt.data= outbuf;
                                     /* write the compressed frame in the media file */
-                                    if (av_write_frame(oFmtCtx, &pkt) != 0) {
+                                    if (av_interleaved_write_frame(oFmtCtx, &pkt) != 0) {
                                         qDebug()<<"Error while writing audio frame\n";
                                         retval=-1;
                                         break;
@@ -221,5 +231,6 @@ int MEAuidoEncoder::encode(MEAudioDecoder* decoder)
         free(inbuf);
         free(outbuf);
         av_write_trailer(oFmtCtx);
+
     return retval;
 }

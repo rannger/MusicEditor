@@ -71,9 +71,12 @@ void MainWindow::translateMusicFormat()
 {
     MEAudioDecoder *decoder=new MEAudioDecoder();
     MEAuidoEncoder *encoder=new MEAuidoEncoder();
+    int ret=0;
     qDebug()<<decoder->initWithFile(musicTable->currentItem()->text());
-    qDebug()<<encoder->OpenFile("e://out.wav",decoder->getSampleRate(),decoder->getBitRate(),decoder->getChannels());
-    encoder->encode(decoder);
+    qDebug()<<(ret=encoder->OpenFile("e://out.mp3",decoder->getSampleRate(),decoder->getBitRate(),decoder->getChannels()));
+    qDebug()<<"here";
+    if(ret!=-1)
+        encoder->encode(decoder);
     delete decoder;
     delete encoder;
 

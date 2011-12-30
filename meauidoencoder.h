@@ -38,6 +38,8 @@ private:
 
     AVOutputFormat * oFormat;
     AVStream *oStream;
+    char fileName[FILENAME_MAX];
+    int flag;
 };
 
 #endif // MEAUIDOENCODER_H
