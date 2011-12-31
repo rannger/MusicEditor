@@ -41,6 +41,7 @@ int MEAuidoEncoder::init()
 
 void MEAuidoEncoder::dealloc()
 {
+     avcodec_close(oCodecCtx);
     int i;
         for(i = 0; i < oFmtCtx->nb_streams; i++) {
             av_freep(&oFmtCtx->streams[i]->codec);
@@ -59,7 +60,6 @@ void MEAuidoEncoder::dealloc()
 int MEAuidoEncoder::OpenFile(const QString& fileName,int sampleRate,int bitRate,int channels,MEAudioDecoder* decoder)
 {
     char* outFile=fileName.toLocal8Bit().data();
-    outFile="/home/administrator/out.mp3";
     bitRate=64000;
     strcat(this->fileName,outFile);
     oFormat=guess_format(NULL,outFile,NULL);
@@ -157,7 +157,6 @@ int MEAuidoEncoder::encode(MEAudioDecoder* decoder)
                 case CODEC_ID_PCM_U16LE:
                 case CODEC_ID_PCM_U16BE:
                     audio_input_frame_size >>= 1;
-                    qDebug()<<"here1";
                     break;
                 default:
                     break;
@@ -165,13 +164,13 @@ int MEAuidoEncoder::encode(MEAudioDecoder* decoder)
             }
             else
             {
-                qDebug()<<"here2";
                 audio_input_frame_size = pInCodecCtx->frame_size;//获取Sample大小
             }
             inputSampleSize=audio_input_frame_size* 2 * pInCodecCtx->channels;
             qDebug()<<"inputSampleSize:"<<inputSampleSize;
         av_init_packet(&packet);
         av_write_header(oFmtCtx);
+        int flag=0;
         while(decoder->readFrame(packet)>=0)
         {
                     // Is this a packet from the audio stream?
@@ -179,7 +178,6 @@ int MEAuidoEncoder::encode(MEAudioDecoder* decoder)
                     {
                         pktdata = packet.data;
                         pktsize = packet.size;
-                        qDebug()<<"frame in size:"<<pktsize;
                         while (pktsize>0)
                         {
                             out_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
@@ -198,14 +196,13 @@ int MEAuidoEncoder::encode(MEAudioDecoder* decoder)
                                 {
                                     AVPacket pkt;
                                     av_init_packet(&pkt);
-//                                    ob_size = FF_MIN_BUFFER_SIZE;
-                                    qDebug()<<oCodecCtx->frame_size;
+                                    ob_size = FF_MIN_BUFFER_SIZE;
                                     pkt.size= avcodec_encode_audio(oCodecCtx, outbuf, out_size, (short *)pinbuf);
                                     if(pkt.size<0)
                                     {
                                         break;
                                     }
-                                    qDebug()<<"frame out size"<<pkt.size;
+
                                     pkt.pts= av_rescale_q(oCodecCtx->coded_frame->pts, oCodecCtx->time_base, oStream->time_base);
                                     pkt.flags |= PKT_FLAG_KEY;
                                     pkt.stream_index= oStream->index;
@@ -216,6 +213,7 @@ int MEAuidoEncoder::encode(MEAudioDecoder* decoder)
                                         retval=-1;
                                         break;
                                     }
+                                    av_free_packet(&pkt);
                                     pinbuf += inputSampleSize;
                                 }
                             }
@@ -229,6 +227,9 @@ int MEAuidoEncoder::encode(MEAudioDecoder* decoder)
         free(inbuf);
         free(outbuf);
         av_write_trailer(oFmtCtx);
-qDebug()<<"encode end";
+
+        qDebug()<<"encode end";
     return retval;
 }
+
+

@@ -35,6 +35,7 @@ public:
     int getBitRate();
     int getChannels();
     int getAudioStream();
+
 private:
     AVFormatContext *pInFmtCtx;
     AVCodecContext *pInCodecCtx;

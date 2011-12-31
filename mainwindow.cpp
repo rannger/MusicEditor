@@ -69,11 +69,19 @@ void MainWindow::about()
 
 void MainWindow::translateMusicFormat()
 {
+    QStringList files = QFileDialog::getOpenFileNames(this, tr("Select Music Files"),
+        QDesktopServices::storageLocation(QDesktopServices::MusicLocation));
+    QString file;
+    foreach (QString string, files) {
+        file=string;
+        break;
+    }
+
     MEAudioDecoder *decoder=new MEAudioDecoder();
     MEAuidoEncoder *encoder=new MEAuidoEncoder();
     int ret=0;
     qDebug()<<decoder->initWithFile(musicTable->currentItem()->text());
-    qDebug()<<(ret=encoder->OpenFile("/home/adminstrator/out.wav",decoder->getSampleRate(),decoder->getBitRate(),decoder->getChannels(),decoder));
+    qDebug()<<(ret=encoder->OpenFile(file,decoder->getSampleRate(),decoder->getBitRate(),decoder->getChannels(),decoder));
     qDebug()<<"here";
     if(ret!=-1)
         encoder->encode(decoder);
