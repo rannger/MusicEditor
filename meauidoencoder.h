@@ -24,7 +24,7 @@ class MEAuidoEncoder
 public:
     MEAuidoEncoder();
     ~MEAuidoEncoder();
-    int OpenFile(const QString& fileName,int sampleRate,int bitRate,int channels);
+    int OpenFile(const QString& fileName,int sampleRate,int bitRate,int channels,MEAudioDecoder* decoder);
     int init();
     void dealloc();
     int encode(MEAudioDecoder* decoder);

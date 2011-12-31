@@ -19,6 +19,7 @@ THIS SOFTWARE IS PROVIDED BY COPYRIGHT HOLDERS ``AS IS'' AND ANY EXPRESS OR IMPL
 #ifndef _FFMPEG_H
 #define _FFMPEG_H
 
+
 extern "C" {
 
 /*#define INT64_C
@@ -26,42 +27,34 @@ extern "C" {
 #define __STDC_CONSTANT_MACROS
 
 #include <stdint.h>*/
+#include <stdint.h>
+#define UINT64_C(a) ((uint64_t)(a))
+#define INT64_C(a) ((int64_t)(a))
 
+#include <libavformat/avformat.h>
+#include <libavformat/avio.h>
 
-
-
-#include "libavformat/avformat.h"
-#include "libavformat/avio.h"
-#include "libavformat/rtsp.h"
-#include "libavformat/rtspcodes.h"
-#include "libavformat/version.h"
-
-#include "libavutil/mathematics.h"
-#include "libavutil/fifo.h"
-#include "libavutil/rational.h"
-#include "libavutil/avstring.h"
-#include "libavutil/adler32.h"
-#include "libavutil/aes.h"
-#include "libavutil/attributes.h"
-#include "libavutil/audioconvert.h"
-#include "libavutil/avassert.h"
-#include "libavutil/avconfig.h"
-#include "libavutil/avutil.h"
-#include "libavutil/base64.h"
-#include "libavutil/common.h"
-#include "libavutil/bswap.h"
-#include "libavutil/cpu.h"
-#include "libavutil/crc.h"
+#include <libavutil/mathematics.h>
+#include <libavutil/fifo.h>
+#include <libavutil/rational.h>
+#include <libavutil/avstring.h>
+#include <libavutil/adler32.h>
+#include <libavutil/attributes.h>
+#include <libavutil/avconfig.h>
+#include <libavutil/avutil.h>
+#include <libavutil/base64.h>
+#include <libavutil/common.h>
+#include <libavutil/crc.h>
 //#include "libavformat/riff.h"
 //#include "libavformat/metadata.h"
 //#include "libavformat/utils.h"
-#include "libavcodec/avcodec.h"
-#include "libavcodec/opt.h"
+#include <libavcodec/avcodec.h>
+#include <libavcodec/opt.h>
 
 //#include "options.h"
 
 //#include "libavutil/internal.h"
-#include "libswscale/swscale.h"
+#include <libswscale/swscale.h>
 
 }
 

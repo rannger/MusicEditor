@@ -73,7 +73,7 @@ void MainWindow::translateMusicFormat()
     MEAuidoEncoder *encoder=new MEAuidoEncoder();
     int ret=0;
     qDebug()<<decoder->initWithFile(musicTable->currentItem()->text());
-    qDebug()<<(ret=encoder->OpenFile("e://out.mp3",decoder->getSampleRate(),decoder->getBitRate(),decoder->getChannels()));
+    qDebug()<<(ret=encoder->OpenFile("/home/adminstrator/out.wav",decoder->getSampleRate(),decoder->getBitRate(),decoder->getChannels(),decoder));
     qDebug()<<"here";
     if(ret!=-1)
         encoder->encode(decoder);
