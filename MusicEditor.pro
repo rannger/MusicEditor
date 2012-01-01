@@ -33,6 +33,8 @@ FORMS    +=
 
 unix{
 
+
+
 DEFINES += UNIX
 
 LIBS += -L /usr/lib/ -lqwt-qt4
