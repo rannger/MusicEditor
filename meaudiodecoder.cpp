@@ -152,3 +152,8 @@ int MEAudioDecoder::getAudioStream()
     return this->audioStreamIndex;
 }
 
+QString MEAudioDecoder::getFileName()
+{
+    QString retval(fileName);
+    return retval;
+}

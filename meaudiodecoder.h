@@ -35,7 +35,7 @@ public:
     int getBitRate();
     int getChannels();
     int getAudioStream();
-
+    QString getFileName();
 private:
     AVFormatContext *pInFmtCtx;
     AVCodecContext *pInCodecCtx;

@@ -31,6 +31,7 @@ public:
     const AVCodecContext* getAVCodecContext();
     const AVFormatContext* getAVFormatContext();
     const AVCodec* getAVCodec();
+    QString getFileName();
 private:
     AVFormatContext *oFmtCtx;
     AVCodecContext *oCodecCtx;

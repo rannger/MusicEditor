@@ -67,6 +67,7 @@ void MainWindow::about()
            " framework that comes with Qt - to create a simple music player."));
 }
 
+int ffmpeg_conver_audio(const char* input_file, const char* output_file, int samples_rate, int channel);
 void MainWindow::translateMusicFormat()
 {
     QStringList files = QFileDialog::getOpenFileNames(this, tr("Select Music Files"),
@@ -83,10 +84,12 @@ void MainWindow::translateMusicFormat()
     qDebug()<<decoder->initWithFile(musicTable->currentItem()->text());
     qDebug()<<(ret=encoder->OpenFile(file,decoder->getSampleRate(),decoder->getBitRate(),decoder->getChannels(),decoder));
     qDebug()<<"here";
-    if(ret!=-1)
-        encoder->encode(decoder);
+//    if(ret!=-1)
+//        encoder->encode(decoder);
+
     delete decoder;
     delete encoder;
+
 
 }
 

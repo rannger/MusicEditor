@@ -39,15 +39,16 @@ extern "C" {
 #include <libavutil/rational.h>
 #include <libavutil/avstring.h>
 #include <libavutil/adler32.h>
-#include <libavutil/attributes.h>
-#include <libavutil/avconfig.h>
+
 #include <libavutil/avutil.h>
 #include <libavutil/base64.h>
 #include <libavutil/common.h>
 #include <libavutil/crc.h>
+
 //#include "libavformat/riff.h"
 //#include "libavformat/metadata.h"
 //#include "libavformat/utils.h"
+#include <libavdevice/avdevice.h>
 #include <libavcodec/avcodec.h>
 #include <libavcodec/opt.h>
 
