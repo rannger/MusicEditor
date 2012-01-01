@@ -44,7 +44,7 @@ extern "C" {
 #include <libavutil/base64.h>
 #include <libavutil/common.h>
 #include <libavutil/crc.h>
-
+#include <libavutil/fifo.h>
 //#include "libavformat/riff.h"
 //#include "libavformat/metadata.h"
 //#include "libavformat/utils.h"

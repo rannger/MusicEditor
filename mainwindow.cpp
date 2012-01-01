@@ -84,8 +84,7 @@ void MainWindow::translateMusicFormat()
     qDebug()<<decoder->initWithFile(musicTable->currentItem()->text());
     qDebug()<<(ret=encoder->OpenFile(file,decoder->getSampleRate(),decoder->getBitRate(),decoder->getChannels(),decoder));
     qDebug()<<"here";
-//    if(ret!=-1)
-//        encoder->encode(decoder);
+        encoder->encode(decoder);
 
     delete decoder;
     delete encoder;

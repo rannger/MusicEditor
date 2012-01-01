@@ -32,6 +32,8 @@ HEADERS  += \
 FORMS    +=
 
 unix{
+
+DEFINES += UNIX
 LIBS += -L/usr/lib -lswscale
 
 INCLUDEPATH += /usr/include/
@@ -63,6 +65,8 @@ INCLUDEPATH += /usr/include/
 DEPENDPATH += /usr/include/
 }
 win32 {
+
+DEFINES += WIN32
 LIBS += -L$$PWD/FFmpeg-full-SDK-3.2/lib/ -lavcodec
 
 INCLUDEPATH += $$PWD/FFmpeg-full-SDK-3.2/include

@@ -60,8 +60,7 @@ void MEAuidoEncoder::dealloc()
 int MEAuidoEncoder::OpenFile(const QString& fileName,int sampleRate,int bitRate,int channels,MEAudioDecoder* decoder)
 {
     char* outFile=fileName.toLocal8Bit().data();
-    bitRate=64000;
-    strcat(this->fileName,outFile);
+    strcpy(this->fileName,outFile);
     oFormat=guess_format(NULL,outFile,NULL);
     if (oFormat==NULL)
     {
@@ -163,7 +162,7 @@ int ffmpeg_conver_audio(const char* input_file, const char* output_file, int sam
                 debug_string("can't open input file\n");
                 return -1;
         }
-        qDebug()<<__FILE__<<":"<<__LINE__;
+        printf("%s:%d\n",__FILE__,__LINE__);
 
         //取出流信息
         if(av_find_stream_info(infmt_ctx) <0)
@@ -171,7 +170,7 @@ int ffmpeg_conver_audio(const char* input_file, const char* output_file, int sam
                 debug_string("can't find suitable codec parameters\n");
                 return -2;
         }
-        qDebug()<<__FILE__<<":"<<__LINE__;
+        printf("%s:%d\n",__FILE__,__LINE__);
 
         //dump_format(infmt_ctx, 0, input_file, 0); //列出输入文件的相关流信息
 
@@ -191,7 +190,7 @@ int ffmpeg_conver_audio(const char* input_file, const char* output_file, int sam
                 debug_string("can't find audio stream\n");
                 return -3;
         }
-        qDebug()<<__FILE__<<":"<<__LINE__;
+        printf("%s:%d\n",__FILE__,__LINE__);
         AVCodecContext *incode_ctx;
         AVCodec *incodec;
 
@@ -204,14 +203,14 @@ int ffmpeg_conver_audio(const char* input_file, const char* output_file, int sam
                 debug_string("can't find suitable audio decoder\n");
                 return -4;
         }
-        qDebug()<<__FILE__<<":"<<__LINE__;
+        printf("%s:%d\n",__FILE__,__LINE__);
         //打开该音频解码器
         if(avcodec_open(incode_ctx, incodec) < 0)
         {
                 debug_string("can't open the audio decoder\n");
                 return -5;
         }
-        qDebug()<<__FILE__<<":"<<__LINE__;
+        printf("%s:%d\n",__FILE__,__LINE__);
         //////////////////////// 输出 ////////////////////////
 
         /* 解析输出文件的格式 */
@@ -224,7 +223,7 @@ int ffmpeg_conver_audio(const char* input_file, const char* output_file, int sam
                 debug_string("Could not find suitable output format\n");
                 return -6;
         }
-        qDebug()<<__FILE__<<":"<<__LINE__;
+        printf("%s:%d\n",__FILE__,__LINE__);
         outfmt->audio_codec = CODEC_ID_MP3;
 
         /* allocate the output media context */
@@ -233,7 +232,7 @@ int ffmpeg_conver_audio(const char* input_file, const char* output_file, int sam
                 debug_string("Memory error\n");
                 return -7;
         }
-        qDebug()<<__FILE__<<":"<<__LINE__;
+        printf("%s:%d\n",__FILE__,__LINE__);
         /* 保存输出文件的格式 */
         outfmt_ctx->oformat = outfmt;
         snprintf(outfmt_ctx->filename, sizeof(outfmt_ctx->filename), "%s", output_file);
@@ -270,7 +269,7 @@ int ffmpeg_conver_audio(const char* input_file, const char* output_file, int sam
                 debug_string("Invalid output format parameters\n");
                 return -8;
         }
-        qDebug()<<__FILE__<<":"<<__LINE__;
+        printf("%s:%d\n",__FILE__,__LINE__);
         /* 列出输出文件的格式信息 */
         dump_format(outfmt_ctx, 0, output_file, 1);
 
@@ -352,7 +351,7 @@ int ffmpeg_conver_audio(const char* input_file, const char* output_file, int sam
         /* 如果输出文件不存在, 则创建输出文件 */
         if (!(outfmt->flags & AVFMT_NOFILE)) {
                 if (url_fopen(&outfmt_ctx->pb, output_file, URL_WRONLY) < 0) {
-                        debug_string("Could not open '%s'\n", output_file);
+                        printf("Could not open '%s'\n", output_file);
                         return -11;
                 }
         }
@@ -360,8 +359,16 @@ int ffmpeg_conver_audio(const char* input_file, const char* output_file, int sam
         /* 写输出文件的头 */
         av_write_header(outfmt_ctx);
 
+
+#ifdef WIN32
         AVFifoBuffer fifo;
         av_fifo_init(&fifo, av_fifo_size(&fifo)+samples_size_ptr);
+#endif
+
+#ifdef UNIX
+        AVFifoBuffer *fifo=av_fifo_alloc(samples_size_ptr);
+
+#endif
 
         int len=0;
 
@@ -381,7 +388,7 @@ int ffmpeg_conver_audio(const char* input_file, const char* output_file, int sam
                                 //samples=(short *)av_fast_realloc(samples,&samples_size,FFMAX(packet.size*sizeof(*samples),AVCODEC_MAX_AUDIO_FRAME_SIZE));
                                 samples_size_ptr = AVCODEC_MAX_AUDIO_FRAME_SIZE;
                                 len = avcodec_decode_audio2(incode_ctx, samples, &samples_size_ptr, pktdata, pktsize);//若为音频包，解码该音频包
-                                debug_string("源文件的帧数：%d\n", incode_ctx->frame_number);
+//                                printf("source frame number：%d\n", incode_ctx->frame_number);
                                 if(len <0)
                                 {
                                         debug_string("while decode audio failure\n");
@@ -390,19 +397,46 @@ int ffmpeg_conver_audio(const char* input_file, const char* output_file, int sam
 
                                 if(samples_size_ptr <= 0)
                                 {
-                                        debug_string("samples_size_ptr 小于0");
+                                        debug_string("samples_size_ptr small than0");
                                         continue;
                                 }
 
                                 pSamples = (uint8_t *)samples;
-
+#ifdef WIN32
                                 av_fifo_realloc(&fifo, av_fifo_size(&fifo)+samples_size_ptr);
                                 //av_fifo_generic_write(&fifo, samples, samples_size_ptr, NULL);
                                 av_fifo_write(&fifo, pSamples, samples_size_ptr);
+#endif
 
-                                uint8_t *audio_buf = (uint8_t *)malloc(outSampleSize);
-                                while (av_fifo_read(&fifo, audio_buf, outSampleSize) == 0)//(av_fifo_size(&fifo) > outSampleSize)
+#ifdef UNIX
+                                int space=av_fifo_generic_write(fifo, samples, samples_size_ptr, NULL);
+                                if(space!=samples_size_ptr)
                                 {
+                                    assert(av_fifo_realloc2(fifo, av_fifo_size(fifo)+(samples_size_ptr-space))>=0);
+                                    av_fifo_generic_write(fifo, samples+space, samples_size_ptr-space, NULL);
+                                }
+
+
+#endif
+                                uint8_t *audio_buf = (uint8_t *)malloc(outSampleSize);
+                                while (/*av_fifo_read(&fifo, audio_buf, outSampleSize) == 0*/true)//(av_fifo_size(&fifo) > outSampleSize)
+                                {
+
+#ifdef WIN32
+                                    int ret=0;
+                                    ret=av_fifo_read(&fifo, audio_buf, outSampleSize);
+                                    if(ret!=0)
+                                        break;
+#endif
+
+#ifdef UNIX
+
+                                    if(av_fifo_size(fifo)<=outSampleSize)
+                                        break;
+                                    qDebug()<<"read out:"<<av_fifo_generic_read(fifo, audio_buf, outSampleSize,NULL);
+#endif
+
+
                                         // 如果音频帧的大小小于FF_MIN_BUFFER_SIZE，编码函数将退出
                                         if (audio_outbuf_size < FF_MIN_BUFFER_SIZE)
                                                 audio_outbuf_size = FF_MIN_BUFFER_SIZE;
@@ -413,7 +447,7 @@ int ffmpeg_conver_audio(const char* input_file, const char* output_file, int sam
                                         int ss = avcodec_encode_audio(outcode_ctx, audio_outbuf, audio_outbuf_size, (short *)audio_buf);
                                         pkt.size = ss;
 
-                                        debug_string("输出文件的帧数：%d\n", outcode_ctx->frame_number);
+//                                        printf("out frame num:%d\n", outcode_ctx->frame_number);
 
                                         // 时间戳在没有视频的情况下，实际上没有设置的必要
                                         if (outcode_ctx->coded_frame && outcode_ctx->coded_frame->pts != AV_NOPTS_VALUE)
