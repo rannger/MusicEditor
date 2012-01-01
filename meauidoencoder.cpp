@@ -363,6 +363,7 @@ int ffmpeg_conver_audio(const char* input_file, const char* output_file, int sam
 #ifdef WIN32
         AVFifoBuffer fifo;
         av_fifo_init(&fifo, av_fifo_size(&fifo)+samples_size_ptr);
+        qDebug()<<__FILE__<<__LINE__;
 #endif
 
 #ifdef UNIX
@@ -374,7 +375,7 @@ int ffmpeg_conver_audio(const char* input_file, const char* output_file, int sam
 
         AVPacket packet;
         av_init_packet(&packet);
-
+        qDebug()<<__FILE__<<__LINE__;
         while(av_read_frame(infmt_ctx, &packet) >= 0)//从输入文件中读取一个包
         {
                 if(packet.stream_index == audioindex)
@@ -427,6 +428,7 @@ int ffmpeg_conver_audio(const char* input_file, const char* output_file, int sam
                                     ret=av_fifo_read(&fifo, audio_buf, outSampleSize);
                                     if(ret!=0)
                                         break;
+                                    qDebug()<<__FILE__<<__LINE__;
 #endif
 
 #ifdef UNIX
