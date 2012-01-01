@@ -162,7 +162,7 @@ int ffmpeg_conver_audio(const char* input_file, const char* output_file, int sam
                 debug_string("can't open input file\n");
                 return -1;
         }
-        printf("%s:%d\n",__FILE__,__LINE__);
+
 
         //取出流信息
         if(av_find_stream_info(infmt_ctx) <0)
@@ -170,7 +170,7 @@ int ffmpeg_conver_audio(const char* input_file, const char* output_file, int sam
                 debug_string("can't find suitable codec parameters\n");
                 return -2;
         }
-        printf("%s:%d\n",__FILE__,__LINE__);
+
 
         //dump_format(infmt_ctx, 0, input_file, 0); //列出输入文件的相关流信息
 
@@ -190,7 +190,7 @@ int ffmpeg_conver_audio(const char* input_file, const char* output_file, int sam
                 debug_string("can't find audio stream\n");
                 return -3;
         }
-        printf("%s:%d\n",__FILE__,__LINE__);
+
         AVCodecContext *incode_ctx;
         AVCodec *incodec;
 
@@ -203,14 +203,14 @@ int ffmpeg_conver_audio(const char* input_file, const char* output_file, int sam
                 debug_string("can't find suitable audio decoder\n");
                 return -4;
         }
-        printf("%s:%d\n",__FILE__,__LINE__);
+
         //打开该音频解码器
         if(avcodec_open(incode_ctx, incodec) < 0)
         {
                 debug_string("can't open the audio decoder\n");
                 return -5;
         }
-        printf("%s:%d\n",__FILE__,__LINE__);
+
         //////////////////////// 输出 ////////////////////////
 
         /* 解析输出文件的格式 */
@@ -223,7 +223,7 @@ int ffmpeg_conver_audio(const char* input_file, const char* output_file, int sam
                 debug_string("Could not find suitable output format\n");
                 return -6;
         }
-        printf("%s:%d\n",__FILE__,__LINE__);
+
         outfmt->audio_codec = CODEC_ID_MP3;
 
         /* allocate the output media context */
@@ -232,7 +232,7 @@ int ffmpeg_conver_audio(const char* input_file, const char* output_file, int sam
                 debug_string("Memory error\n");
                 return -7;
         }
-        printf("%s:%d\n",__FILE__,__LINE__);
+
         /* 保存输出文件的格式 */
         outfmt_ctx->oformat = outfmt;
         snprintf(outfmt_ctx->filename, sizeof(outfmt_ctx->filename), "%s", output_file);
@@ -269,7 +269,7 @@ int ffmpeg_conver_audio(const char* input_file, const char* output_file, int sam
                 debug_string("Invalid output format parameters\n");
                 return -8;
         }
-        printf("%s:%d\n",__FILE__,__LINE__);
+
         /* 列出输出文件的格式信息 */
         dump_format(outfmt_ctx, 0, output_file, 1);
 
