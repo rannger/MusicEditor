@@ -9,6 +9,7 @@ int main(int argv, char **args)
     app.setApplicationName("Music Player");
     app.setQuitOnLastWindowClosed(true);
     avcodec_register_all();
+    avdevice_register_all();
     av_register_all();
     MainWindow window;
 

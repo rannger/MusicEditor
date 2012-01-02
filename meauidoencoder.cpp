@@ -149,9 +149,9 @@ int ffmpeg_conver_audio(const char* input_file, const char* output_file, int sam
         int i = 0;
 
         //////////////////////// 初始化 ////////////////////////
-        avcodec_register_all();
-        avdevice_register_all();
-        av_register_all();
+//        avcodec_register_all();
+//        avdevice_register_all();
+//        av_register_all();
 
         //////////////////////// 输入 ////////////////////////
         infmt_ctx = av_alloc_format_context();
