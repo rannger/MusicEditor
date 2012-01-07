@@ -34,10 +34,15 @@ public:
     int getSampleRate();
     int getBitRate();
     int getChannels();
-    int getAudioStream();
     QString getFileName();
+    int getAudioIndex(){return audioindex;}
+
 private:
     char fileName[FILENAME_MAX];
+    AVFormatContext *infmt_ctx;
+    AVCodecContext *incode_ctx;
+    AVCodec *incodec;
+    int audioindex;
 };
 
 #endif // MEAUDIODECODER_H

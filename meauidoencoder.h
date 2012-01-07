@@ -24,14 +24,20 @@ class MEAuidoEncoder
 public:
     MEAuidoEncoder();
     ~MEAuidoEncoder();
-    int OpenFile(const QString& fileName,int sampleRate,int bitRate,int channels,MEAudioDecoder* decoder);
+    int OpenFile(const QString& fileName,int sampleRate,int channels,MEAudioDecoder* decoder);
     int init();
     void dealloc();
-    int encode(MEAudioDecoder* decoder);
+ /*   int encode(MEAudioDecoder* decoder); */
+    int encoder(MEAudioDecoder* decoder);
     QString getFileName();
 private:
     char fileName[FILENAME_MAX];
-
+    AVOutputFormat *outfmt;
+    AVFormatContext *outfmt_ctx;
+    AVCodecContext *outcode_ctx;
+    AVCodec *outcodec;
+    AVStream *audio_st;
+    int outSampleSize;
 };
 
 #endif // MEAUIDOENCODER_H

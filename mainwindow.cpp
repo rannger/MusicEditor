@@ -82,9 +82,9 @@ void MainWindow::translateMusicFormat()
     MEAuidoEncoder *encoder=new MEAuidoEncoder();
     int ret=0;
     qDebug()<<decoder->initWithFile(musicTable->currentItem()->text());
-    qDebug()<<(ret=encoder->OpenFile(file,decoder->getSampleRate(),decoder->getBitRate(),decoder->getChannels(),decoder));
+    qDebug()<<(ret=encoder->OpenFile(file,decoder->getSampleRate(),decoder->getChannels(),decoder));
     qDebug()<<"here";
-        encoder->encode(decoder);
+    encoder->encoder(decoder);
 
     delete decoder;
     delete encoder;
