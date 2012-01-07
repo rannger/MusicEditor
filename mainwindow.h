@@ -16,7 +16,7 @@ class QLCDNumber;
 QT_END_NAMESPACE
 
 //![0]
-
+class Plot;
 class MainWindow : public QMainWindow
 {
 //![0]
@@ -68,6 +68,7 @@ private:
     QAction *aboutQtAction;
     QLCDNumber *timeLcd;
     QTableWidget *musicTable;
+    Plot *plot;
 };
 
 #endif

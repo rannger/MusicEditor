@@ -3,12 +3,12 @@
 #include "mainwindow.h"
 #include "meaudiodecoder.h"
 #include "meauidoencoder.h"
+#include "plot.h"
 //#include "libavformat/avformat.h"
 //#include "libavdevice/avdevice.h"
 //#include "libswscale/swscale.h"
 //#include "libavutil/fifo.h"
 //#include "libavutil/avstring.h"
-
 
 //![0]
 MainWindow::MainWindow()
@@ -352,6 +352,9 @@ void MainWindow::setupUi()
     playbackLayout->addWidget(volumeSlider);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
+    plot=new Plot();
+    plot->resize(600,400);
+    mainLayout->addWidget(plot);
     mainLayout->addWidget(musicTable);
     mainLayout->addLayout(seekerLayout);
     mainLayout->addLayout(playbackLayout);
@@ -362,5 +365,4 @@ void MainWindow::setupUi()
     setCentralWidget(widget);
     setWindowTitle("Music Editor");
 }
-
 

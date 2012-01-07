@@ -18,7 +18,8 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     ffmpeg.cpp \
     meaudiodecoder.cpp \
-    meauidoencoder.cpp
+    meauidoencoder.cpp \
+    plot.cpp
 
 
 
@@ -27,7 +28,9 @@ HEADERS  += \
     meaudiodecoder.h \
     meauidoencoder.h \
     debug_string.h \
-    ffmpeg.h
+    ffmpeg.h \
+    qwt_headfile.h \
+    plot.h
 
 
 FORMS    +=
