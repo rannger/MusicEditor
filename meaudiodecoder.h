@@ -17,7 +17,7 @@
 #ifndef MEAUDIODECODER_H
 #define MEAUDIODECODER_H
 #include <QtCore>
-#include "OtherClass/ffmpeg.h"
+#include "ffmpeg.h"
 
 class MEAudioDecoder
 {

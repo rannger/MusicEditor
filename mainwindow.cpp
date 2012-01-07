@@ -1,5 +1,5 @@
 #include <QtGui>
-#include "OtherClass/ffmpeg.h"
+#include "ffmpeg.h"
 #include "mainwindow.h"
 #include "meaudiodecoder.h"
 #include "meauidoencoder.h"

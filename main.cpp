@@ -1,6 +1,6 @@
 #include <QtGui>
 #include "mainwindow.h"
-#include "OtherClass/ffmpeg.h"
+#include "ffmpeg.h"
 
 
 int main(int argv, char **args)

@@ -23,11 +23,11 @@ SOURCES += main.cpp\
 
 
 HEADERS  += \
-    OtherClass/ffmpeg.h \
     mainwindow.h \
     meaudiodecoder.h \
     meauidoencoder.h \
-    debug_string.h
+    debug_string.h \
+    ffmpeg.h
 
 
 FORMS    +=
