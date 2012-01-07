@@ -16,6 +16,7 @@
 
 #include "meauidoencoder.h"
 #include "meaudiodecoder.h"
+#include "debug_string.h"
 #include <assert.h>
 
 MEAuidoEncoder::MEAuidoEncoder()
@@ -25,35 +26,16 @@ MEAuidoEncoder::MEAuidoEncoder()
 
 MEAuidoEncoder::~MEAuidoEncoder()
 {
-    if(flag!=-1)
        dealloc();
 }
 
 int MEAuidoEncoder::init()
 {
-    oFmtCtx=NULL;
-    oCodecCtx=NULL;
-    pOutCodec=NULL;
-    oFormat=NULL;
-    oStream=NULL;
     return 0;
 }
 
 void MEAuidoEncoder::dealloc()
 {
-     avcodec_close(oCodecCtx);
-    int i;
-        for(i = 0; i < oFmtCtx->nb_streams; i++) {
-            av_freep(&oFmtCtx->streams[i]->codec);
-            av_freep(&oFmtCtx->streams[i]);
-        }
-        if (!(oFormat->flags & AVFMT_NOFILE)) {
-            // close the output file
-            url_fclose(oFmtCtx->pb);
-        }
-        // free the stream
-        if(oFmtCtx)
-            av_free(oFmtCtx);
 }
 
 
@@ -61,65 +43,7 @@ int MEAuidoEncoder::OpenFile(const QString& fileName,int sampleRate,int bitRate,
 {
     char* outFile=fileName.toLocal8Bit().data();
     strcpy(this->fileName,outFile);
-    oFormat=guess_format(NULL,outFile,NULL);
-    if (oFormat==NULL)
-    {
-        qDebug()<<"not found output file format";
-        flag=-1;
-        return -1;
-    }
 
-    oFmtCtx =  av_alloc_format_context();
-    if (oFmtCtx==NULL)
-    {
-            qDebug()<<"av_alloc_format_context failed";
-            flag=-1;
-            return -1;
-    }
-
-    oFmtCtx->oformat = oFormat;
-    oStream = av_new_stream(oFmtCtx,1);
-    oCodecCtx = oStream->codec;
-
-    oCodecCtx->codec_id = oFmtCtx->oformat->audio_codec;
-    oCodecCtx->codec_type = CODEC_TYPE_AUDIO;
-    oCodecCtx->sample_rate = sampleRate;
-    oCodecCtx->bit_rate = bitRate;
-    oCodecCtx->channels = channels;
-    oCodecCtx->sample_fmt=SAMPLE_FMT_S16;
-    oCodecCtx->bit_rate_tolerance=bitRate;
-//    qDebug()<<"sampleRate:"<<sampleRate;
-//    qDebug()<<"bitRate:"<<bitRate;
-//    qDebug()<<"channels:"<<channels;
-
-    pOutCodec = avcodec_find_encoder(oStream->codec->codec_id);
-
-
-    if(avcodec_open(oCodecCtx, pOutCodec)<0)
-    {
-        qDebug()<<"avcodec_open failed.";
-        flag=-1;
-        return -1; // Could not open codec
-    }
-
-    if (av_set_parameters(oFmtCtx, NULL) < 0)
-    {
-        qDebug()<<"Invalid output format parameters\n";
-        flag=-1;
-        return -1;
-    }
-    dump_format(oFmtCtx, 0, outFile, 1);
-
-    if (!(oFormat->flags & AVFMT_NOFILE))
-    {
-       if (url_fopen(&oFmtCtx->pb, outFile, URL_WRONLY) < 0)
-       {
-           qDebug()<<"Could not open "<<outFile;
-           flag=-1;
-           return -1;
-       }
-   }
-    qDebug()<<"open success "<<outFile;
     return 0;
 }
 static int ffmpeg_conver_audio(const char* input_file, const char* output_file, int samples_rate, int channel);
@@ -127,8 +51,8 @@ int MEAuidoEncoder::encode(MEAudioDecoder* decoder)
 {
     return ffmpeg_conver_audio(decoder->getFileName().toLocal8Bit().data(),
                                 fileName,
-                                decoder->getSampleRate(),
-                                decoder->getChannels());
+                                44100,
+                                2);
 }
 
 QString MEAuidoEncoder::getFileName()
@@ -137,10 +61,7 @@ QString MEAuidoEncoder::getFileName()
     return retval;
 }
 
-void debug_string(const char *err_msg, ...)
-{
-    qDebug()<<err_msg;
-}
+
 
 int ffmpeg_conver_audio(const char* input_file, const char* output_file, int samples_rate, int channel)
 {

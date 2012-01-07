@@ -26,7 +26,8 @@ HEADERS  += \
     OtherClass/ffmpeg.h \
     mainwindow.h \
     meaudiodecoder.h \
-    meauidoencoder.h
+    meauidoencoder.h \
+    debug_string.h
 
 
 FORMS    +=
@@ -104,43 +105,3 @@ LIBS += -L$$PWD/FFmpeg-full-SDK-3.2/lib/ -lswscale
 INCLUDEPATH += $$PWD/FFmpeg-full-SDK-3.2/include
 DEPENDPATH += $$PWD/FFmpeg-full-SDK-3.2/include
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -15,6 +15,7 @@
 **************************************************************************/
 #include <QDebug>
 #include "meaudiodecoder.h"
+#include "debug_string.h"
 
 MEAudioDecoder::MEAudioDecoder()
 {
@@ -28,128 +29,59 @@ MEAudioDecoder::~MEAudioDecoder()
 
 int MEAudioDecoder::init()
 {
-    pInFmtCtx=NULL;
-    pInCodecCtx=NULL;
-    pInCodec=NULL;
-    audioStreamIndex=-1;
     return 0;
 }
 
 void MEAudioDecoder::dealloc()
 {
-    SafeFreeCodecContext(pInCodecCtx);
-    SaveCloseFormatContext(pInFmtCtx);
 }
 
 int MEAudioDecoder::initWithFile(const QString& fileName)
 {
     const char * infile = fileName.toLocal8Bit().data();
     strcpy(this->fileName,infile);
-    unsigned int i, audioStream;
 
-
-    if (av_open_input_file(&pInFmtCtx, infile, NULL, 0, NULL)!=0)
-    {
-        qDebug()<<"av_open_input_file failed.\n";
-        flag=-1;
-        return -1; // Couldn't open file
-    }
-    if (pInFmtCtx==NULL)
-    {
-        qDebug()<<"av_open_input_file OK, but FormatContext==NULL";
-        flag=-1;
-        return -1; // Couldn't open file
-    }
-    if(Safe_av_find_stream_info(pInFmtCtx)<0)
-    {
-        qDebug()<<"av_find_stream_info failed.";
-        flag=-1;
-        return -1; // Couldn't find stream
-    }
-
-    // Find the first audio stream
-    audioStream = -1;
-    for(i=0; i<pInFmtCtx->nb_streams; i++)
-        if(pInFmtCtx->streams[i]->codec->codec_type==CODEC_TYPE_AUDIO)
-        {
-            audioStream=i;
-            break;
-        }
-    if(audioStream==-1)
-    {
-        qDebug()<<"input file has no audio stream";
-        flag=-1;
-        return -1; // Didn't find a audio stream
-    }
-    audioStreamIndex=audioStream;
-    // Get a pointer to the codec context for the audio stream
-    pInCodecCtx = pInFmtCtx->streams[audioStream]->codec;
-    // Find the decoder for the audio stream
-    pInCodec = avcodec_find_decoder(pInCodecCtx->codec_id);
-    if(pInCodec==NULL)
-    {
-         qDebug()<<"no Decoder found";
-         flag=-1;
-        return -1; // Codec not found
-    }
-    // Inform the codec that we can handle truncated bitstreams -- i.e.,
-    // bitstreams where frame boundaries can fall in the middle of packets
-    //if(pInCodec->capabilities & CODEC_CAP_TRUNCATED)
-    //    pInCodecCtx->flags|=CODEC_FLAG_TRUNCATED;
-    // Open codec
-    if(avcodec_open(pInCodecCtx, pInCodec)<0)
-    {
-        qDebug()<<("avcodec_open failed.");
-        flag=-1;
-        return -1; // Could not open codec
-    }
-
-    sampleRate=pInFmtCtx->streams[audioStream]->codec->sample_rate;
-    bitRate=pInFmtCtx->streams[audioStream]->codec->bit_rate;
-    channels=pInFmtCtx->streams[audioStream]->codec->channels;
-    dump_format(pInFmtCtx, 0, infile, 0);
-    qDebug()<<"open success "<<infile;
     return 0;
 }
 
 AVCodecContext* MEAudioDecoder::getAVCodecContext()
 {
-    return this->pInCodecCtx;
+    return 0;
 }
 
 AVFormatContext* MEAudioDecoder::getAVFormatContext()
 {
-    return this->pInFmtCtx;
+    return 0;
 }
 
 AVCodec* MEAudioDecoder::getAVCodec()
 {
-    return this->pInCodec;
+    return 0;
 }
 
 int MEAudioDecoder::getSampleRate()
 {
-    return this->sampleRate;
+    return 0;
 }
 
 int MEAudioDecoder::getBitRate()
 {
-    return this->bitRate;
+    return 0;
 }
 
 int MEAudioDecoder::getChannels()
 {
-    return this->channels;
+    return 0;
 }
 
 int MEAudioDecoder::readFrame(AVPacket &packet)
 {
-    return av_read_frame(pInFmtCtx, &packet);
+    return 0;
 }
 
 int MEAudioDecoder::getAudioStream()
 {
-    return this->audioStreamIndex;
+    return 0;
 }
 
 QString MEAudioDecoder::getFileName()

@@ -28,19 +28,10 @@ public:
     int init();
     void dealloc();
     int encode(MEAudioDecoder* decoder);
-    const AVCodecContext* getAVCodecContext();
-    const AVFormatContext* getAVFormatContext();
-    const AVCodec* getAVCodec();
     QString getFileName();
 private:
-    AVFormatContext *oFmtCtx;
-    AVCodecContext *oCodecCtx;
-    AVCodec *pOutCodec;
-
-    AVOutputFormat * oFormat;
-    AVStream *oStream;
     char fileName[FILENAME_MAX];
-    int flag;
+
 };
 
 #endif // MEAUIDOENCODER_H
