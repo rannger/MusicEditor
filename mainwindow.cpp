@@ -61,7 +61,7 @@ void MainWindow::addFiles()
     }
     if (!sources.isEmpty())
         metaInformationResolver->setCurrentSource(sources.at(index));
-    QVector<uint8_t> data;
+    QVector<double> data;
     decoder->decoder(data);
     plot->update(data);
 }

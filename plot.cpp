@@ -53,7 +53,7 @@ Plot::Plot()
     plotCurve=NULL;
 }
 
-void Plot::update(const QVector<uint8_t> &data)
+void Plot::update(const QVector<double> &data)
 {
 
     // Insert new curves

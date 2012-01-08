@@ -7,7 +7,7 @@ class Plot : public QwtPlot
 {
 public:
     Plot();
-    void update(const QVector<uint8_t> &data);
+    void update(const QVector<double> &data);
 private:
     QwtPlotCurve* plotCurve;
 };

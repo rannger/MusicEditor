@@ -42,7 +42,7 @@ void MEAudioDecoder::dealloc()
         av_close_input_file(infmt_ctx);
     fileName[0]='\0';
 }
-int MEAudioDecoder::decoder(QVector<uint8_t>& retData)
+int MEAudioDecoder::decoder(QVector<double>& retData)
 {
     AVPacket packet;
     av_init_packet(&packet);

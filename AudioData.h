@@ -6,9 +6,9 @@
 class AudioData:public QwtData
 {
 private:
-    QVector<uint8_t> data;
+    QVector<double> data;
 public:
-    AudioData(const QVector<uint8_t>& aData)
+    AudioData(const QVector<double>& aData)
     {
         data=aData;
     }
@@ -33,10 +33,7 @@ public:
 
     virtual double y(size_t i) const
     {
-        double retval=0.0f;
-        retval=(double)(data[i]);
-        qDebug()<<retval;
-        return retval;
+        return data[i];
     }
 };
 
