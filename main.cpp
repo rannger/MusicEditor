@@ -6,7 +6,7 @@
 int main(int argv, char **args)
 {
     QApplication app(argv, args);
-    app.setApplicationName("Music Player");
+    app.setApplicationName("Music Editor");
     app.setQuitOnLastWindowClosed(true);
     avcodec_register_all();
     avdevice_register_all();

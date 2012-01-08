@@ -84,6 +84,15 @@ int MEAudioDecoder::decoder(QVector<double>& retData)
                         }
                         else
                         {
+                            for(int index=0;index<samples_size_ptr;index+=4096<<1)
+                            {
+                                int16_t data=samples[index]+(samples[index+1]<<8);
+                                if(samples[index+1]&0x80)
+                                    data|=0xffff0000;
+                                double fdata=data/32767.0f;
+
+                                retData.append(fdata);
+                            }
 
                         }
                 }

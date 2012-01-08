@@ -173,6 +173,12 @@ void MainWindow::tableClicked(int row, int /* column */)
 
     mediaObject->setCurrentSource(sources[row]);
 
+    decoder->dealloc();
+    decoder->initWithFile(sources[row].fileName());
+    QVector<double> data;
+    decoder->decoder(data);
+    plot->update(data);
+
     if (wasPlaying)
         mediaObject->play();
     else

@@ -60,6 +60,8 @@ void Plot::update(const QVector<double> &data)
     if(plotCurve)
         plotCurve->detach();
     delete plotCurve;
+
+    this->replot();
     QwtPlotCurve *plotCurve = new QwtPlotCurve("");
 #if QT_VERSION >= 0x040000
     plotCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
@@ -68,13 +70,10 @@ void Plot::update(const QVector<double> &data)
     plotCurve->attach(this);
 
     // Create sin and cos data
-    plotCurve->setData(SimpleData(::cos, 100));
-//    plotCurve->setData(AudioData(data));
+//    plotCurve->setData(SimpleData(::cos, 100));
+    plotCurve->setData(AudioData(data));
+    qDebug()<<AudioData(data).size();
     this->replot();
 //    cCos->setData(SimpleData(::cos, 100));
-
-    // Insert markers
-
-    //  ...a horizontal line at y = 0...
 
 }
