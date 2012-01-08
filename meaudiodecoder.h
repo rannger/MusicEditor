@@ -36,7 +36,7 @@ public:
     int getChannels();
     QString getFileName();
     int getAudioIndex(){return audioindex;}
-
+    int decoder(QVector<uint8_t>& retData);
 private:
     char fileName[FILENAME_MAX];
     AVFormatContext *infmt_ctx;

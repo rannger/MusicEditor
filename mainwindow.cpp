@@ -33,10 +33,12 @@ MainWindow::MainWindow()
 //![1]
     Phonon::createPath(mediaObject, audioOutput);
 //![1]
-
+    plot=new Plot();
+    decoder=new MEAudioDecoder();
     setupActions();
     setupMenus();
     setupUi();
+
     timeLcd->display("00:00");
 }
 
@@ -53,10 +55,15 @@ void MainWindow::addFiles()
     foreach (QString string, files) {
             Phonon::MediaSource source(string);
             sources.append(source);
+            decoder->dealloc();
+            decoder->initWithFile(string);
+            break;
     }
     if (!sources.isEmpty())
         metaInformationResolver->setCurrentSource(sources.at(index));
-
+    QVector<uint8_t> data;
+    decoder->decoder(data);
+    plot->update(data);
 }
 //![6]
 
@@ -78,7 +85,8 @@ void MainWindow::translateMusicFormat()
         break;
     }
 
-    MEAudioDecoder *decoder=new MEAudioDecoder();
+//    MEAudioDecoder *decoder=new MEAudioDecoder();
+    decoder->dealloc();
     MEAuidoEncoder *encoder=new MEAuidoEncoder();
     int ret=0;
     qDebug()<<decoder->initWithFile(musicTable->currentItem()->text());
@@ -352,9 +360,10 @@ void MainWindow::setupUi()
     playbackLayout->addWidget(volumeSlider);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
-    plot=new Plot();
+
     plot->resize(600,400);
     mainLayout->addWidget(plot);
+
     mainLayout->addWidget(musicTable);
     mainLayout->addLayout(seekerLayout);
     mainLayout->addLayout(playbackLayout);

@@ -17,6 +17,7 @@ QT_END_NAMESPACE
 
 //![0]
 class Plot;
+class MEAudioDecoder;
 class MainWindow : public QMainWindow
 {
 //![0]
@@ -69,6 +70,7 @@ private:
     QLCDNumber *timeLcd;
     QTableWidget *musicTable;
     Plot *plot;
+    MEAudioDecoder *decoder;
 };
 
 #endif

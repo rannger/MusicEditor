@@ -30,7 +30,8 @@ HEADERS  += \
     debug_string.h \
     ffmpeg.h \
     qwt_headfile.h \
-    plot.h
+    plot.h \
+    AudioData.h
 
 
 FORMS    +=

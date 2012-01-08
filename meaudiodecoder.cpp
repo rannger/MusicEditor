@@ -29,13 +29,70 @@ MEAudioDecoder::~MEAudioDecoder()
 
 int MEAudioDecoder::init()
 {
+    incode_ctx=NULL;
+    infmt_ctx=NULL;
     return 0;
 }
 
 void MEAudioDecoder::dealloc()
 {
-    avcodec_close(incode_ctx);
-    av_close_input_file(infmt_ctx);
+    if(incode_ctx)
+        avcodec_close(incode_ctx);
+    if(infmt_ctx)
+        av_close_input_file(infmt_ctx);
+    fileName[0]='\0';
+}
+int MEAudioDecoder::decoder(QVector<uint8_t>& retData)
+{
+    AVPacket packet;
+    av_init_packet(&packet);
+    int pktsize;
+    uint8_t* pktdata=NULL;
+
+    int audio_outbuf_size = AVCODEC_MAX_AUDIO_FRAME_SIZE; //FF_MIN_BUFFER_SIZE; //outSampleSize;//inputSampleSize;//
+    uint8_t *audio_outbuf = (uint8_t *)av_malloc(audio_outbuf_size); // *2 * oAcc->channels);
+
+    int samples_size_ptr = AVCODEC_MAX_AUDIO_FRAME_SIZE;
+    short *samples = (short*)av_malloc(AVCODEC_MAX_AUDIO_FRAME_SIZE);
+    retData.empty();
+    int len;
+    int retval=0;
+    while(readFrame(packet)>=0)
+    {
+        if(packet.stream_index == audioindex)
+        {
+                pktsize = packet.size;
+                pktdata = packet.data;
+
+                if (pktsize > 0)
+                {
+                        //if(&packet)
+                        //samples=(short *)av_fast_realloc(samples,&samples_size,FFMAX(packet.size*sizeof(*samples),AVCODEC_MAX_AUDIO_FRAME_SIZE));
+                        samples_size_ptr = AVCODEC_MAX_AUDIO_FRAME_SIZE;
+                        len = avcodec_decode_audio2(incode_ctx, samples, &samples_size_ptr, pktdata, pktsize);//若为音频包，解码该音频包
+//                                printf("source frame number：%d\n", incode_ctx->frame_number);
+                        if(len <0)
+                        {
+                                debug_string("while decode audio failure\n");
+                                break;
+                        };
+
+                        if(samples_size_ptr <= 0)
+                        {
+                                debug_string("samples_size_ptr small than0");
+                                continue;
+                        }
+                        else
+                        {
+
+                        }
+                }
+          }
+                av_free_packet(&packet);
+    }
+    av_free(samples);
+    av_free(audio_outbuf);
+    return 0;
 }
 
 int MEAudioDecoder::initWithFile(const QString& fileName)

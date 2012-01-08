@@ -1,11 +1,10 @@
 #include "plot.h"
-
-
+#include "AudioData.h"
 class SimpleData: public QwtData
 {
     // The x values depend on its index and the y values
     // can be calculated from the corresponding x value.
-    // So we dont need to store the values.
+    // So we donŽt need to store the values.
     // Such an implementation is slower because every point
     // has to be recalculated for every replot, but it demonstrates how
     // QwtData can be used.
@@ -45,49 +44,37 @@ Plot::Plot()
 {
     setTitle("A Simple QwtPlot Demonstration");
     insertLegend(new QwtLegend(), QwtPlot::RightLegend);
-
-    // Set axis titles
-//    setAxisTitle(xBottom, "x -->");
-//    setAxisTitle(yLeft, "y -->");
-
-    // Insert new curves
-    QwtPlotCurve *cSin = new QwtPlotCurve("y = sin(x)");
-#if QT_VERSION >= 0x040000
-    cSin->setRenderHint(QwtPlotItem::RenderAntialiased);
-#endif
-    cSin->setPen(QPen(Qt::red));
-    cSin->attach(this);
-
-//    QwtPlotCurve *cCos = new QwtPlotCurve("y = cos(x)");
-//#if QT_VERSION >= 0x040000
-//    cCos->setRenderHint(QwtPlotItem::RenderAntialiased);
-//#endif
-//    cCos->setPen(QPen(Qt::blue));
-//    cCos->attach(this);
-
-    // Create sin and cos data
-    const int nPoints = 2000;
-    cSin->setData(SimpleData(::sin, nPoints));
-//    cCos->setData(SimpleData(::cos, nPoints));
-
-    // Insert markers
-
-    //  ...a horizontal line at y = 0...
+//    update();
     QwtPlotMarker *mY = new QwtPlotMarker();
-    mY->setLabel(QString::fromLatin1("y = 0"));
     mY->setLabelAlignment(Qt::AlignRight|Qt::AlignTop);
     mY->setLineStyle(QwtPlotMarker::HLine);
     mY->setYValue(0.0);
     mY->attach(this);
-
-    //  ...a vertical line at x = 2 * pi
-    QwtPlotMarker *mX = new QwtPlotMarker();
-    mX->setLabel(QString::fromLatin1("x = 2 pi"));
-    mX->setLabelAlignment(Qt::AlignLeft | Qt::AlignBottom);
-    mX->setLabelOrientation(Qt::Vertical);
-    mX->setLineStyle(QwtPlotMarker::VLine);
-    mX->setLinePen(QPen(Qt::black, 0, Qt::DashDotLine));
-    mX->setXValue(2.0 * M_PI);
-    mX->attach(this);
+    plotCurve=NULL;
 }
 
+void Plot::update(const QVector<uint8_t> &data)
+{
+
+    // Insert new curves
+    if(plotCurve)
+        plotCurve->detach();
+    delete plotCurve;
+    QwtPlotCurve *plotCurve = new QwtPlotCurve("");
+#if QT_VERSION >= 0x040000
+    plotCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
+#endif
+    plotCurve->setPen(QPen(Qt::blue));
+    plotCurve->attach(this);
+
+    // Create sin and cos data
+    plotCurve->setData(SimpleData(::cos, 100));
+//    plotCurve->setData(AudioData(data));
+    this->replot();
+//    cCos->setData(SimpleData(::cos, 100));
+
+    // Insert markers
+
+    //  ...a horizontal line at y = 0...
+
+}
