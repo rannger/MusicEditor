@@ -27,6 +27,7 @@
 //#include "libavutil/avstring.h"
 
 QFutureWatcher< QVector<double> > *MainWindow::decoderWatcher=NULL;
+QFutureWatcher<void> *MainWindow::encoderWatcher=NULL;
 //![0]
 MainWindow::MainWindow()
 {
@@ -56,6 +57,7 @@ MainWindow::MainWindow()
     setupMenus();
     setupUi();
     decoderWatcher=new QFutureWatcher< QVector<double> >(plot);
+    encoderWatcher=new QFutureWatcher<void>(this);
     connect(decoderWatcher,SIGNAL(finished()),plot,SLOT(finish()));
     connect(decoderWatcher,SIGNAL(resultReadyAt(int)),plot,SLOT(showCurve(int)));
     timeLcd->display("00:00");
@@ -82,18 +84,11 @@ void MainWindow::addFiles()
     foreach (QString string, files) {
             Phonon::MediaSource source(string);
             sources.append(source);
-//            decoder->dealloc();
-//            decoder->initWithFile(string);
             file=string;
             break;
     }
     if (!sources.isEmpty())
         metaInformationResolver->setCurrentSource(sources.at(index));
-/*    QVector<double> data;
-    decoder->decoder(data);
-    plot->update(data)*/;
-
-//    QFuture< QVector<double> > f1=QtConcurrent::run(AsynchronousDecoder,files,this->decoder,this->plot);
 
     decoderWatcher->setFuture(QtConcurrent::run(AsynchronousDecoder,file,this->decoder,this->plot));
 }
@@ -118,17 +113,16 @@ void MainWindow::translateMusicFormat()
     }
 
 //    MEAudioDecoder *decoder=new MEAudioDecoder();
-    decoder->dealloc();
-    MEAuidoEncoder *encoder=new MEAuidoEncoder();
-    int ret=0;
-    qDebug()<<decoder->initWithFile(musicTable->currentItem()->text());
-    qDebug()<<(ret=encoder->OpenFile(file,decoder->getSampleRate(),decoder->getChannels(),decoder));
-    qDebug()<<"here";
-    encoder->encoder(decoder);
+//    decoder->dealloc();
+//    MEAuidoEncoder *encoder=new MEAuidoEncoder();
+//    int ret=0;
+//    qDebug()<<decoder->initWithFile(musicTable->currentItem()->text());
+//    qDebug()<<(ret=encoder->OpenFile(file,decoder->getSampleRate(),decoder->getChannels(),decoder));
+//    qDebug()<<"here";
+//    encoder->encoder(decoder);
 
-    delete decoder;
-    delete encoder;
-
+//    delete encoder;
+    encoderWatcher->setFuture(QtConcurrent::run(AsynchronousEncoder,file,decoder));
 
 }
 
@@ -162,7 +156,6 @@ void MainWindow::stateChanged(Phonon::State newState, Phonon::State /* oldState 
                 pauseAction->setEnabled(false);
                 stopAction->setEnabled(true);
                 playAction->setEnabled(true);
-;
                 break;
 //![10]
         case Phonon::BufferingState:
@@ -246,13 +239,6 @@ void MainWindow::metaStateChanged(Phonon::State newState, Phonon::State /* oldSt
 
     titleItem->setFlags(titleItem->flags() ^ Qt::ItemIsEditable);
 
-//    QTableWidgetItem *artistItem = new QTableWidgetItem(metaData.value("ARTIST"));
-//    artistItem->setFlags(artistItem->flags() ^ Qt::ItemIsEditable);
-//    QTableWidgetItem *albumItem = new QTableWidgetItem(metaData.value("ALBUM"));
-//    albumItem->setFlags(albumItem->flags() ^ Qt::ItemIsEditable);
-//    QTableWidgetItem *yearItem = new QTableWidgetItem(metaData.value("DATE"));
-//    yearItem->setFlags(yearItem->flags() ^ Qt::ItemIsEditable);
-
     int currentRow = musicTable->rowCount();
     musicTable->insertRow(currentRow);
     musicTable->setItem(currentRow, 0, titleItem);
@@ -306,7 +292,7 @@ void MainWindow::setupActions()
     previousAction = new QAction(style()->standardIcon(QStyle::SP_MediaSkipBackward), tr("Previous"), this);
     previousAction->setShortcut(tr("Ctrl+R"));
     previousAction->setDisabled(true);
-    addFilesAction = new QAction(tr("Add &Files"), this);
+    addFilesAction = new QAction(tr("Import &Files"), this);
     addFilesAction->setShortcut(tr("Ctrl+F"));
     exitAction = new QAction(tr("E&xit"), this);
     exitAction->setShortcuts(QKeySequence::Quit);
@@ -314,7 +300,7 @@ void MainWindow::setupActions()
     aboutAction->setShortcut(tr("Ctrl+B"));
     aboutQtAction = new QAction(tr("About &Qt"), this);
     aboutQtAction->setShortcut(tr("Ctrl+Q"));
-    translateAction = new QAction(style()->standardIcon(QStyle::SP_DirClosedIcon),tr("Wav to mp3"),this);
+    translateAction = new QAction(style()->standardIcon(QStyle::SP_DirClosedIcon),tr("&Export File"),this);
 
 //![5]
     connect(playAction, SIGNAL(triggered()), mediaObject, SLOT(play()));
@@ -333,9 +319,9 @@ void MainWindow::setupMenus()
     QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
     fileMenu->addAction(addFilesAction);
     fileMenu->addSeparator();
+    fileMenu->addAction(translateAction);
+    fileMenu->addSeparator();
     fileMenu->addAction(exitAction);
-//    QMenu* translateMenu=menuBar()->addMenu(tr("&Translate"));
-//    translateMenu->addAction(translateAction);
 
     QMenu *aboutMenu = menuBar()->addMenu(tr("&Help"));
     aboutMenu->addAction(aboutAction);
@@ -352,7 +338,7 @@ void MainWindow::setupUi()
     bar->addAction(pauseAction);
     bar->addAction(stopAction);   
     bar->addAction(nextAction);
-    bar->addAction(translateAction);
+//    bar->addAction(translateAction);
 
 //![4]
     seekSlider = new Phonon::SeekSlider(this);

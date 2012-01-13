@@ -17,10 +17,12 @@
 #ifndef ASYNCHRONOUS_DECODE_H
 #define ASYNCHRONOUS_DECODE_H
 #include "meaudiodecoder.h"
+#include "meauidoencoder.h"
 #include "plot.h"
 #include <QtCore>
 #include <QDebug>
 
 extern QVector<double> AsynchronousDecoder(QString file,MEAudioDecoder *decoder,Plot* plot);
+extern void AsynchronousEncoder(QString file,MEAudioDecoder *decoder);
 
 #endif // ASYNCHRONOUS_DECODE_H

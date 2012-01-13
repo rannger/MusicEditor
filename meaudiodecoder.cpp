@@ -104,6 +104,11 @@ int MEAudioDecoder::decoder(QVector<double>& retData)
     return 0;
 }
 
+int MEAudioDecoder::SeekFrame(int num)
+{
+    return av_seek_frame(infmt_ctx,num,0,0);
+}
+
 int MEAudioDecoder::initWithFile(const QString& fileName)
 {
     char * infile = fileName.toLocal8Bit().data();

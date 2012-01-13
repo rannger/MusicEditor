@@ -15,6 +15,7 @@
 **************************************************************************/
 
 #include "asynchronous_decode.h"
+#include <assert.h>
 QVector<double> AsynchronousDecoder(QString file,MEAudioDecoder *decoder,Plot* plot)
 {
     decoder->dealloc();
@@ -27,3 +28,16 @@ QVector<double> AsynchronousDecoder(QString file,MEAudioDecoder *decoder,Plot* p
     return data;
 }
 
+void AsynchronousEncoder(QString file,MEAudioDecoder *decoder)
+{
+    assert(decoder);
+    MEAuidoEncoder *encoder=new MEAuidoEncoder();
+    int ret=0;
+    qDebug()<<(ret=encoder->OpenFile(file,decoder->getSampleRate(),decoder->getChannels(),decoder));
+    if(ret!=0)
+        goto END;
+    encoder->encoder(decoder);
+END:
+    delete encoder;
+    qDebug()<<"encode finish";
+}

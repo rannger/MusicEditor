@@ -88,6 +88,7 @@ private:
     MEAudioDecoder *decoder;
 public:
     static QFutureWatcher< QVector<double> > *decoderWatcher;
+    static QFutureWatcher<void> *encoderWatcher;
 };
 
 #endif
