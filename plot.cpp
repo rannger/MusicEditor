@@ -15,6 +15,9 @@
 **************************************************************************/
 #include "plot.h"
 #include "AudioData.h"
+#include "mainwindow.h"
+#include <assert.h>
+
 class SimpleData: public QwtData
 {
     // The x values depend on its index and the y values
@@ -55,7 +58,8 @@ private:
     double(*d_y)(double);
 };
 
-Plot::Plot()
+Plot::Plot(QWidget *parent)
+    :QwtPlot(parent)
 {
     setTitle("A Simple QwtPlot Demonstration");
     insertLegend(new QwtLegend(), QwtPlot::RightLegend);
@@ -91,4 +95,17 @@ void Plot::update(const QVector<double> &data)
     this->replot();
 //    cCos->setData(SimpleData(::cos, 100));
 
+}
+
+void Plot::finish()
+{
+    qDebug()<<"finish";
+}
+
+void Plot::showCurve(int num)
+{
+    this->clear();
+    MainWindow* mainWindow=(MainWindow*)parent();
+    assert(mainWindow);
+    update(mainWindow->decoderWatcher->resultAt(num));
 }

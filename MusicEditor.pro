@@ -19,7 +19,8 @@ SOURCES += main.cpp\
     ffmpeg.cpp \
     meaudiodecoder.cpp \
     meauidoencoder.cpp \
-    plot.cpp
+    plot.cpp \
+    asynchronous_decode.cpp
 
 
 
@@ -31,7 +32,8 @@ HEADERS  += \
     ffmpeg.h \
     qwt_headfile.h \
     plot.h \
-    AudioData.h
+    AudioData.h \
+    asynchronous_decode.h
 
 
 FORMS    +=

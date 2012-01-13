@@ -23,7 +23,7 @@
 #include <phonon/volumeslider.h>
 #include <phonon/backendcapabilities.h>
 #include <QList>
-
+#include <QtGui>
 QT_BEGIN_NAMESPACE
 class QAction;
 class QTableWidget;
@@ -40,7 +40,7 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow();
-
+    virtual ~MainWindow();
     QSize sizeHint() const {
         return QSize(500, 300);
     }
@@ -86,6 +86,8 @@ private:
     QTableWidget *musicTable;
     Plot *plot;
     MEAudioDecoder *decoder;
+public:
+    static QFutureWatcher< QVector<double> > *decoderWatcher;
 };
 
 #endif

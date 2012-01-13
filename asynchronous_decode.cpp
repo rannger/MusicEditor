@@ -13,22 +13,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 **************************************************************************/
-#ifndef PLOT_H
-#define PLOT_H
-#include "qwt_headfile.h"
-#include <stdint.h>
 
-class Plot : public QwtPlot
+#include "asynchronous_decode.h"
+QVector<double> AsynchronousDecoder(QString file,MEAudioDecoder *decoder,Plot* plot)
 {
-    Q_OBJECT
-public:
-    explicit Plot(QWidget *parent = 0);
-    void update(const QVector<double> &data);
-public slots:
-    void finish();
-    void showCurve(int num);
-private:
-    QwtPlotCurve* plotCurve;
-};
+    decoder->dealloc();
+    if(decoder->initWithFile(file)<0)
+        return QVector<double>();
+    QVector<double> data;
+    decoder->decoder(data);
+//    plot->update(data);
+    qDebug()<<"decode finsih";
+    return data;
+}
 
-#endif // PLOT_H

@@ -13,18 +13,20 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 **************************************************************************/
-#include <QtGui>
+
 #include "ffmpeg.h"
 #include "mainwindow.h"
 #include "meaudiodecoder.h"
 #include "meauidoencoder.h"
 #include "plot.h"
+#include "asynchronous_decode.h"
 //#include "libavformat/avformat.h"
 //#include "libavdevice/avdevice.h"
 //#include "libswscale/swscale.h"
 //#include "libavutil/fifo.h"
 //#include "libavutil/avstring.h"
 
+QFutureWatcher< QVector<double> > *MainWindow::decoderWatcher=NULL;
 //![0]
 MainWindow::MainWindow()
 {
@@ -48,13 +50,22 @@ MainWindow::MainWindow()
 //![1]
     Phonon::createPath(mediaObject, audioOutput);
 //![1]
-    plot=new Plot();
+    plot=new Plot(this);
     decoder=new MEAudioDecoder();
     setupActions();
     setupMenus();
     setupUi();
-
+    decoderWatcher=new QFutureWatcher< QVector<double> >(plot);
+    connect(decoderWatcher,SIGNAL(finished()),plot,SLOT(finish()));
+    connect(decoderWatcher,SIGNAL(resultReadyAt(int)),plot,SLOT(showCurve(int)));
     timeLcd->display("00:00");
+}
+
+MainWindow::~MainWindow()
+{
+    if(decoderWatcher)
+        delete decoderWatcher;
+    decoderWatcher=0;
 }
 
 //![6]
@@ -67,18 +78,24 @@ void MainWindow::addFiles()
         return;
 
     int index = sources.size();
+    QString file;
     foreach (QString string, files) {
             Phonon::MediaSource source(string);
             sources.append(source);
-            decoder->dealloc();
-            decoder->initWithFile(string);
+//            decoder->dealloc();
+//            decoder->initWithFile(string);
+            file=string;
             break;
     }
     if (!sources.isEmpty())
         metaInformationResolver->setCurrentSource(sources.at(index));
-    QVector<double> data;
+/*    QVector<double> data;
     decoder->decoder(data);
-    plot->update(data);
+    plot->update(data)*/;
+
+//    QFuture< QVector<double> > f1=QtConcurrent::run(AsynchronousDecoder,files,this->decoder,this->plot);
+
+    decoderWatcher->setFuture(QtConcurrent::run(AsynchronousDecoder,file,this->decoder,this->plot));
 }
 //![6]
 
@@ -188,12 +205,7 @@ void MainWindow::tableClicked(int row, int /* column */)
 
     mediaObject->setCurrentSource(sources[row]);
 
-    decoder->dealloc();
-    decoder->initWithFile(sources[row].fileName());
-    QVector<double> data;
-    decoder->decoder(data);
-    plot->update(data);
-
+    decoderWatcher->setFuture(QtConcurrent::run(AsynchronousDecoder,sources[row].fileName(),this->decoder,this->plot));
     if (wasPlaying)
         mediaObject->play();
     else
