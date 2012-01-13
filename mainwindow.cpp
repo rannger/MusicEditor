@@ -122,7 +122,9 @@ void MainWindow::translateMusicFormat()
 //    encoder->encoder(decoder);
 
 //    delete encoder;
-    encoderWatcher->setFuture(QtConcurrent::run(AsynchronousEncoder,file,decoder));
+    int64_t seekTime=mediaObject->currentTime();
+    qDebug()<<"seekTime:"<<seekTime;
+    encoderWatcher->setFuture(QtConcurrent::run(AsynchronousEncoder,file,decoder,seekTime));
 
 }
 

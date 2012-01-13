@@ -251,7 +251,7 @@ int MEAuidoEncoder::encode(MEAudioDecoder* decoder)
      av_init_packet(&packet);
      qDebug()<<__FILE__<<__LINE__;
 //     while(av_read_frame(infmt_ctx, &packet) >= 0)//从输入文件中读取一个包
-     assert(!(decoder->SeekFrame(0)<0));
+
      while(decoder->readFrame(packet)>=0)
      {
              if(packet.stream_index == audioindex)
@@ -334,7 +334,7 @@ int MEAuidoEncoder::encode(MEAudioDecoder* decoder)
                                      pkt.flags |= PKT_FLAG_KEY;  // 设不设置好像都没有什么影响
                                      pkt.stream_index = audio_st->index;// audioindex;
                                      pkt.data = audio_outbuf;
-
+                                     qDebug()<<"stream index:"<<pkt.stream_index;
                                      if (pkt.size >0)
                                      {
                                              if (av_write_frame(outfmt_ctx, &pkt) != 0)

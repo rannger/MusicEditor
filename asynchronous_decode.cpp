@@ -28,10 +28,11 @@ QVector<double> AsynchronousDecoder(QString file,MEAudioDecoder *decoder,Plot* p
     return data;
 }
 
-void AsynchronousEncoder(QString file,MEAudioDecoder *decoder)
+void AsynchronousEncoder(QString file,MEAudioDecoder *decoder,int64_t time)
 {
     assert(decoder);
     MEAuidoEncoder *encoder=new MEAuidoEncoder();
+    assert(!(decoder->SeekFrame(time)<0));
     int ret=0;
     qDebug()<<(ret=encoder->OpenFile(file,decoder->getSampleRate(),decoder->getChannels(),decoder));
     if(ret!=0)

@@ -23,6 +23,6 @@
 #include <QDebug>
 
 extern QVector<double> AsynchronousDecoder(QString file,MEAudioDecoder *decoder,Plot* plot);
-extern void AsynchronousEncoder(QString file,MEAudioDecoder *decoder);
+extern void AsynchronousEncoder(QString file,MEAudioDecoder *decoder,int64_t time);
 
 #endif // ASYNCHRONOUS_DECODE_H
