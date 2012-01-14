@@ -25,6 +25,7 @@ public:
     MEAudioDecoder();
     virtual ~MEAudioDecoder();
     virtual int initWithFile(const QString& fileName);
+    virtual int OpenFile(const QString& fileName);
     virtual int init();
     virtual void dealloc();
     int readFrame(AVPacket &packet);
@@ -38,12 +39,15 @@ public:
     int getAudioIndex(){return audioindex;}
     int decoder(QVector<double>& retData);
     int SeekFrame(int64_t num=0);
+    int getSuccessFlag();
 private:
     char fileName[FILENAME_MAX];
     AVFormatContext *infmt_ctx;
     AVCodecContext *incode_ctx;
     AVCodec *incodec;
     int audioindex;
+
+    int successFlag;
 };
 
 #endif // MEAUDIODECODER_H

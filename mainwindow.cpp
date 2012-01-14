@@ -20,11 +20,7 @@
 #include "meauidoencoder.h"
 #include "plot.h"
 #include "asynchronous_decode.h"
-//#include "libavformat/avformat.h"
-//#include "libavdevice/avdevice.h"
-//#include "libswscale/swscale.h"
-//#include "libavutil/fifo.h"
-//#include "libavutil/avstring.h"
+
 
 QFutureWatcher< QVector<double> > *MainWindow::decoderWatcher=NULL;
 QFutureWatcher<void> *MainWindow::encoderWatcher=NULL;
@@ -51,15 +47,15 @@ MainWindow::MainWindow()
 //![1]
     Phonon::createPath(mediaObject, audioOutput);
 //![1]
-    plot=new Plot(this);
     decoder=new MEAudioDecoder();
     setupActions();
     setupMenus();
     setupUi();
-    decoderWatcher=new QFutureWatcher< QVector<double> >(plot);
+    decoderWatcher=new QFutureWatcher< QVector<double> >(this);
     encoderWatcher=new QFutureWatcher<void>(this);
-    connect(decoderWatcher,SIGNAL(finished()),plot,SLOT(finish()));
-    connect(decoderWatcher,SIGNAL(resultReadyAt(int)),plot,SLOT(showCurve(int)));
+    connect(decoderWatcher,SIGNAL(resultReadyAt(int)),this,SLOT(showCurve(int)));
+    previousRow=-1;
+    justPaintRow=-1;
     timeLcd->display("00:00");
 }
 
@@ -67,7 +63,11 @@ MainWindow::~MainWindow()
 {
     if(decoderWatcher)
         delete decoderWatcher;
+    if(encoderWatcher)
+        delete encoderWatcher;
     decoderWatcher=0;
+    encoderWatcher=0;
+    delete decoder;
 }
 
 //![6]
@@ -89,42 +89,37 @@ void MainWindow::addFiles()
     }
     if (!sources.isEmpty())
         metaInformationResolver->setCurrentSource(sources.at(index));
-
-    decoderWatcher->setFuture(QtConcurrent::run(AsynchronousDecoder,file,this->decoder,this->plot));
 }
 //![6]
 
 void MainWindow::about()
 {
-    QMessageBox::information(this, tr("About Music Player"),
+    QMessageBox::information(this, tr("About Music Editor"),
         tr("The Music Player example shows how to use Phonon - the multimedia"
            " framework that comes with Qt - to create a simple music player."));
 }
 
-int ffmpeg_conver_audio(const char* input_file, const char* output_file, int samples_rate, int channel);
 void MainWindow::translateMusicFormat()
 {
-    QStringList files = QFileDialog::getOpenFileNames(this, tr("Select Music Files"),
-        QDesktopServices::storageLocation(QDesktopServices::MusicLocation));
-    QString file;
-    foreach (QString string, files) {
-        file=string;
-        break;
+    QString file = QFileDialog::getSaveFileName(this,tr("save file"),QDesktopServices::storageLocation(QDesktopServices::MusicLocation),
+                                                "Music (*.mp3 *.wav *.wma)");
+
+
+    int64_t seekTime=mediaObject->currentTime();
+
+    if(file.length())
+    {
+        if(!QFile::exists(file))
+        {
+            QFile musicFile(file);
+            musicFile.open(QIODevice::Truncate);
+            char a='\0';
+            musicFile.write(&a);
+            musicFile.close();
+        }
+        encoderWatcher->setFuture(QtConcurrent::run(AsynchronousEncoder,file,decoder,seekTime));
     }
 
-//    MEAudioDecoder *decoder=new MEAudioDecoder();
-//    decoder->dealloc();
-//    MEAuidoEncoder *encoder=new MEAuidoEncoder();
-//    int ret=0;
-//    qDebug()<<decoder->initWithFile(musicTable->currentItem()->text());
-//    qDebug()<<(ret=encoder->OpenFile(file,decoder->getSampleRate(),decoder->getChannels(),decoder));
-//    qDebug()<<"here";
-//    encoder->encoder(decoder);
-
-//    delete encoder;
-    int64_t seekTime=mediaObject->currentTime();
-    qDebug()<<"seekTime:"<<seekTime;
-    encoderWatcher->setFuture(QtConcurrent::run(AsynchronousEncoder,file,decoder,seekTime));
 
 }
 
@@ -190,6 +185,11 @@ void MainWindow::tick(qint64 time)
 //![12]
 void MainWindow::tableClicked(int row, int /* column */)
 {
+    if(previousRow==row)
+        return;
+    else
+        previousRow=row;
+
     bool wasPlaying = mediaObject->state() == Phonon::PlayingState;
 
     mediaObject->stop();
@@ -200,11 +200,18 @@ void MainWindow::tableClicked(int row, int /* column */)
 
     mediaObject->setCurrentSource(sources[row]);
 
-    decoderWatcher->setFuture(QtConcurrent::run(AsynchronousDecoder,sources[row].fileName(),this->decoder,this->plot));
+    Plot* plot=dynamic_cast<Plot*>(musicTable->cellWidget(row,1));
+//    decoder->dealloc();
+//    decoder->OpenFile(sources[row].fileName());
+    if(plot&&!plot->isPainted)
+        decoderWatcher->setFuture(QtConcurrent::run(AsynchronousDecoder,sources[row].fileName(),decoder));
     if (wasPlaying)
         mediaObject->play();
     else
         mediaObject->stop();
+    decoder->dealloc();
+    decoder->OpenFile(sources[row].fileName());
+    qDebug()<<decoder->getFileName();
 }
 //![12]
 
@@ -243,11 +250,12 @@ void MainWindow::metaStateChanged(Phonon::State newState, Phonon::State /* oldSt
 
     int currentRow = musicTable->rowCount();
     musicTable->insertRow(currentRow);
-    musicTable->setItem(currentRow, 0, titleItem);
-//    musicTable->setItem(currentRow, 1, artistItem);
-//    musicTable->setItem(currentRow, 2, albumItem);
-//    musicTable->setItem(currentRow, 3, yearItem);
-
+    justPaintRow=currentRow;
+    musicTable->setItem(currentRow, 0, titleItem);  
+    QString file=metaInformationResolver->currentSource().fileName();
+    decoderWatcher->setFuture(QtConcurrent::run(AsynchronousDecoder,file,decoder));
+    Plot* plot=new Plot(musicTable);
+    musicTable->setCellWidget(currentRow,1,plot);
 
     if (musicTable->selectedItems().isEmpty()) {
         musicTable->selectRow(0);
@@ -261,8 +269,10 @@ void MainWindow::metaStateChanged(Phonon::State newState, Phonon::State /* oldSt
     }
     else {
         musicTable->resizeColumnsToContents();
-        if (musicTable->columnWidth(0) > 300)
-            musicTable->setColumnWidth(0, 1000);
+//        if (musicTable->columnWidth(0) > 300)
+//            musicTable->setColumnWidth(0, 1000);
+         musicTable->setColumnWidth(1, 1000);
+         musicTable->setRowHeight(currentRow,300);
     }
 }
 //![15]
@@ -362,14 +372,15 @@ void MainWindow::setupUi()
 
     QStringList headers;
 //    headers << tr("Title") << tr("Artist") << tr("Album") << tr("Year");
-    headers<<tr("file name");
-    musicTable = new QTableWidget(0, 1);
+    headers<<tr("File name")<<tr("Waveform");
+    musicTable = new QTableWidget(0, 2);
     musicTable->setHorizontalHeaderLabels(headers);
     musicTable->setSelectionMode(QAbstractItemView::SingleSelection);
-    musicTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+    musicTable->setSelectionBehavior(QAbstractItemView::SelectItems);
+    musicTable->setEditTriggers ( QAbstractItemView::NoEditTriggers );
     connect(musicTable, SIGNAL(cellPressed(int,int)),
             this, SLOT(tableClicked(int,int)));
-
+    musicTable->setColumnWidth(1,1000);
     QHBoxLayout *seekerLayout = new QHBoxLayout;
     seekerLayout->addWidget(seekSlider);
     seekerLayout->addWidget(timeLcd);
@@ -382,12 +393,11 @@ void MainWindow::setupUi()
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
 
-    plot->resize(600,400);
-    mainLayout->addWidget(plot);
 
-    mainLayout->addWidget(musicTable);
+
     mainLayout->addLayout(seekerLayout);
     mainLayout->addLayout(playbackLayout);
+    mainLayout->addWidget(musicTable);
 
     QWidget *widget = new QWidget;
     widget->setLayout(mainLayout);
@@ -396,3 +406,25 @@ void MainWindow::setupUi()
     setWindowTitle("Music Editor");
 }
 
+void MainWindow::showCurve(int num)
+{
+    int currentRow=this->justPaintRow;
+    currentRow=currentRow<0?0:currentRow;
+    Plot* plot=dynamic_cast<Plot*>(musicTable->cellWidget(currentRow,1));
+    if(plot)
+    {
+        QVector<double> result=decoderWatcher->resultAt(num);
+        if(result.count())
+            plot->update(result);
+        else
+        {
+            musicTable->removeRow(currentRow);
+            sources.removeAt(currentRow);
+            metaInformationResolver->clearQueue();
+            mediaObject->clearQueue();
+            QMessageBox::information(this, tr("Alert"),
+                tr("Fail to open the file"));
+        }
+    }
+    justPaintRow=-1;
+}

@@ -28,7 +28,7 @@ int main(int argv, char **args)
     av_register_all();
     MainWindow window;
 
-    window.show();
+    window.showMaximized();
     return app.exec();
 }
 

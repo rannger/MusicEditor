@@ -44,6 +44,8 @@ public:
     QSize sizeHint() const {
         return QSize(500, 300);
     }
+public slots:
+    void showCurve(int num);
 
 private slots:
     void addFiles();
@@ -84,8 +86,9 @@ private:
     QAction *aboutQtAction;
     QLCDNumber *timeLcd;
     QTableWidget *musicTable;
-    Plot *plot;
     MEAudioDecoder *decoder;
+    int previousRow;
+    int justPaintRow;
 public:
     static QFutureWatcher< QVector<double> > *decoderWatcher;
     static QFutureWatcher<void> *encoderWatcher;

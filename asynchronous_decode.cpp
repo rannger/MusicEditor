@@ -16,10 +16,11 @@
 
 #include "asynchronous_decode.h"
 #include <assert.h>
-QVector<double> AsynchronousDecoder(QString file,MEAudioDecoder *decoder,Plot* plot)
+QVector<double> AsynchronousDecoder(QString file,MEAudioDecoder *decoder)
 {
     decoder->dealloc();
-    if(decoder->initWithFile(file)<0)
+    decoder->OpenFile(file);
+    if(decoder->getSuccessFlag()<0)
         return QVector<double>();
     QVector<double> data;
     decoder->decoder(data);

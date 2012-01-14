@@ -24,6 +24,7 @@ class Plot : public QwtPlot
 public:
     explicit Plot(QWidget *parent = 0);
     void update(const QVector<double> &data);
+    bool isPainted;
 public slots:
     void finish();
     void showCurve(int num);

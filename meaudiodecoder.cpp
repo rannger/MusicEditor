@@ -27,10 +27,21 @@ MEAudioDecoder::~MEAudioDecoder()
     dealloc();
 }
 
+int MEAudioDecoder::getSuccessFlag()
+{
+    return successFlag;
+}
+
+int MEAudioDecoder::OpenFile(const QString &fileName)
+{
+    return (successFlag=initWithFile(fileName));
+}
+
 int MEAudioDecoder::init()
 {
     incode_ctx=NULL;
     infmt_ctx=NULL;
+    successFlag=-1;
     return 0;
 }
 
