@@ -47,7 +47,7 @@ MainWindow::MainWindow()
 //![1]
     Phonon::createPath(mediaObject, audioOutput);
 //![1]
-    decoder=new MEAudioDecoder();
+//    decoder=new MEAudioDecoder();
     setupActions();
     setupMenus();
     setupUi();
@@ -67,7 +67,15 @@ MainWindow::~MainWindow()
         delete encoderWatcher;
     decoderWatcher=0;
     encoderWatcher=0;
-    delete decoder;
+//    delete decoder;
+    QMap<int,MEAudioDecoder*>::Iterator it;
+    for( it = decoders.begin();  it != decoders.end();  ++it)
+    {
+        MEAudioDecoder* decoder=(MEAudioDecoder*)it.value();
+        delete decoder;
+    }
+
+
 }
 
 //![6]
@@ -117,6 +125,7 @@ void MainWindow::translateMusicFormat()
             musicFile.write(&a);
             musicFile.close();
         }
+        MEAudioDecoder* decoder=decoders[musicTable->currentRow()<0?0:musicTable->currentRow()];
         encoderWatcher->setFuture(QtConcurrent::run(AsynchronousEncoder,file,decoder,seekTime));
     }
 
@@ -142,17 +151,23 @@ void MainWindow::stateChanged(Phonon::State newState, Phonon::State /* oldState 
                 playAction->setEnabled(false);
                 pauseAction->setEnabled(true);
                 stopAction->setEnabled(true);
+                addFilesAction->setEnabled(false);
+                translateAction->setEnabled(false);
                 break;
         case Phonon::StoppedState:
                 stopAction->setEnabled(false);
                 playAction->setEnabled(true);
                 pauseAction->setEnabled(false);
+                addFilesAction->setEnabled(true);
+                translateAction->setEnabled(true);
                 timeLcd->display("00:00");
                 break;
         case Phonon::PausedState:
                 pauseAction->setEnabled(false);
                 stopAction->setEnabled(true);
                 playAction->setEnabled(true);
+                addFilesAction->setEnabled(true);
+                translateAction->setEnabled(true);
                 break;
 //![10]
         case Phonon::BufferingState:
@@ -201,6 +216,7 @@ void MainWindow::tableClicked(int row, int /* column */)
     mediaObject->setCurrentSource(sources[row]);
 
     Plot* plot=dynamic_cast<Plot*>(musicTable->cellWidget(row,1));
+    MEAudioDecoder* decoder=decoders[row];
 //    decoder->dealloc();
 //    decoder->OpenFile(sources[row].fileName());
     if(plot&&!plot->isPainted)
@@ -209,9 +225,9 @@ void MainWindow::tableClicked(int row, int /* column */)
         mediaObject->play();
     else
         mediaObject->stop();
-    decoder->dealloc();
-    decoder->OpenFile(sources[row].fileName());
-    qDebug()<<decoder->getFileName();
+//    decoder->dealloc();
+//    decoder->OpenFile(sources[row].fileName());
+//    qDebug()<<decoder->getFileName();
 }
 //![12]
 
@@ -253,6 +269,8 @@ void MainWindow::metaStateChanged(Phonon::State newState, Phonon::State /* oldSt
     justPaintRow=currentRow;
     musicTable->setItem(currentRow, 0, titleItem);  
     QString file=metaInformationResolver->currentSource().fileName();
+    MEAudioDecoder* decoder=new MEAudioDecoder();
+    decoders.insert(currentRow,decoder);
     decoderWatcher->setFuture(QtConcurrent::run(AsynchronousDecoder,file,decoder));
     Plot* plot=new Plot(musicTable);
     musicTable->setCellWidget(currentRow,1,plot);
@@ -422,6 +440,7 @@ void MainWindow::showCurve(int num)
             sources.removeAt(currentRow);
             metaInformationResolver->clearQueue();
             mediaObject->clearQueue();
+            this->decoders.remove(currentRow);
             QMessageBox::information(this, tr("Alert"),
                 tr("Fail to open the file"));
         }

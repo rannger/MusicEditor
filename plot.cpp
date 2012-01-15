@@ -28,7 +28,7 @@ Plot::Plot(QWidget *parent)
     insertLegend(new QwtLegend(), QwtPlot::RightLegend);
 //    update();
     QwtPlotMarker *mY = new QwtPlotMarker();
-    mY->setLabelAlignment(Qt::AlignRight|Qt::AlignTop);
+    mY->setLabelAlignment(Qt::AlignRight|Qt::AlignBottom);
     mY->setLineStyle(QwtPlotMarker::HLine);
     mY->setYValue(0.0);
     mY->attach(this);
@@ -49,23 +49,13 @@ void Plot::update(const QVector<double> &data)
     plotCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
 #endif
     plotCurve->setPen(QPen(Qt::blue));
-    plotCurve->attach(this);
 
+    plotCurve->attach(this);
+    plotCurve=plotCurve;
     plotCurve->setData(AudioData(data));
     qDebug()<<AudioData(data).size();
     this->replot();
     isPainted=true;
 }
 
-void Plot::finish()
-{
-    qDebug()<<"finish";
-}
 
-void Plot::showCurve(int num)
-{
-    this->clear();
-    MainWindow* mainWindow=(MainWindow*)parent();
-    assert(mainWindow);
-    update(mainWindow->decoderWatcher->resultAt(num));
-}

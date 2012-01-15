@@ -95,6 +95,7 @@ int MEAudioDecoder::decoder(QVector<double>& retData)
                         }
                         else
                         {
+                            qDebug()<<packet.duration;
                             for(int index=0;index<samples_size_ptr;index+=4096<<1)
                             {
                                 int16_t data=samples[index]+(samples[index+1]<<8);
@@ -119,7 +120,7 @@ int MEAudioDecoder::SeekFrame(int64_t num)
 {
     double timestamp=(double)num;
     timestamp/=1000;
-    return av_seek_frame(infmt_ctx,-1,int64_t(46*AV_TIME_BASE),AVSEEK_FLAG_FRAME);
+    return av_seek_frame(infmt_ctx,-1,int64_t(timestamp*AV_TIME_BASE),AVSEEK_FLAG_FRAME);
 }
 
 int MEAudioDecoder::initWithFile(const QString& fileName)

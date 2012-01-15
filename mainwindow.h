@@ -86,9 +86,10 @@ private:
     QAction *aboutQtAction;
     QLCDNumber *timeLcd;
     QTableWidget *musicTable;
-    MEAudioDecoder *decoder;
+//    MEAudioDecoder *decoder;
     int previousRow;
     int justPaintRow;
+    QMap<int,MEAudioDecoder*> decoders;
 public:
     static QFutureWatcher< QVector<double> > *decoderWatcher;
     static QFutureWatcher<void> *encoderWatcher;
