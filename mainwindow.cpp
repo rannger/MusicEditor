@@ -289,7 +289,8 @@ void MainWindow::metaStateChanged(Phonon::State newState, Phonon::State /* oldSt
         musicTable->resizeColumnsToContents();
 //        if (musicTable->columnWidth(0) > 300)
 //            musicTable->setColumnWidth(0, 1000);
-         musicTable->setColumnWidth(1, 1000);
+         musicTable->setColumnWidth(1, 900);
+         musicTable->setColumnWidth(0, 300);
          musicTable->setRowHeight(currentRow,300);
     }
 }

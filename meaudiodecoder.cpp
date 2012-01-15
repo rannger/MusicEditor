@@ -68,6 +68,7 @@ int MEAudioDecoder::decoder(QVector<double>& retData)
     retData.empty();
     int len;
     int retval=0;
+    int test=0;
     while(readFrame(packet)>=0)
     {
         if(packet.stream_index == audioindex)
@@ -95,7 +96,7 @@ int MEAudioDecoder::decoder(QVector<double>& retData)
                         }
                         else
                         {
-                            qDebug()<<packet.duration;
+
                             for(int index=0;index<samples_size_ptr;index+=4096<<1)
                             {
                                 int16_t data=samples[index]+(samples[index+1]<<8);
