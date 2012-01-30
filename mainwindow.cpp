@@ -20,6 +20,7 @@
 #include "meauidoencoder.h"
 #include "plot.h"
 #include "asynchronous_decode.h"
+#include <assert.h>
 
 
 QFutureWatcher< QVector<double> > *MainWindow::decoderWatcher=NULL;
@@ -225,21 +226,16 @@ void MainWindow::tableClicked(int row, int /* column */)
         mediaObject->play();
     else
         mediaObject->stop();
-//    decoder->dealloc();
-//    decoder->OpenFile(sources[row].fileName());
-//    qDebug()<<decoder->getFileName();
 }
-//![12]
 
-//![13]
+
 void MainWindow::sourceChanged(const Phonon::MediaSource &source)
 {
     musicTable->selectRow(sources.indexOf(source));
     timeLcd->display("00:00");
 }
-//![13]
 
-//![14]
+
 void MainWindow::metaStateChanged(Phonon::State newState, Phonon::State /* oldState */)
 {
     if (newState == Phonon::ErrorState) {
@@ -262,12 +258,22 @@ void MainWindow::metaStateChanged(Phonon::State newState, Phonon::State /* oldSt
     QTableWidgetItem *titleItem = NULL;
     titleItem=new QTableWidgetItem(metaInformationResolver->currentSource().fileName());
 
+    QWidget *titleWidget=new QWidget(musicTable);
+    QVBoxLayout *titleLayout = new QVBoxLayout;
+    QLabel *titleLable=new QLabel(metaInformationResolver->currentSource().fileName());
+
+
+    titleLayout->addWidget(titleLable);
+    titleWidget->setLayout(titleLayout);
+
+
     titleItem->setFlags(titleItem->flags() ^ Qt::ItemIsEditable);
 
     int currentRow = musicTable->rowCount();
     musicTable->insertRow(currentRow);
     justPaintRow=currentRow;
-    musicTable->setItem(currentRow, 0, titleItem);  
+//    musicTable->setItem(currentRow, 0, titleItem);
+    musicTable->setCellWidget(currentRow,0,titleWidget);
     QString file=metaInformationResolver->currentSource().fileName();
     MEAudioDecoder* decoder=new MEAudioDecoder();
     decoders.insert(currentRow,decoder);
@@ -430,11 +436,28 @@ void MainWindow::showCurve(int num)
     int currentRow=this->justPaintRow;
     currentRow=currentRow<0?0:currentRow;
     Plot* plot=dynamic_cast<Plot*>(musicTable->cellWidget(currentRow,1));
+    QWidget *titleWidget =dynamic_cast<QWidget*>(musicTable->cellWidget(currentRow,0));
+    QVBoxLayout *titleLayout =dynamic_cast<QVBoxLayout*>(titleWidget->layout());
+
+
     if(plot)
     {
         QVector<double> result=decoderWatcher->resultAt(num);
         if(result.count())
+        {
             plot->update(result);
+            MEAudioDecoder* decoder=decoders[num];
+
+            QString bitrate=QString("Bitrate:").append(QString::number(decoder->getBitRate()));
+            QString channels=QString("Channels:").append(QString::number(decoder->getChannels()));
+            QString sampleRate=QString("SampleRate:").append(QString::number(decoder->getSampleRate()));
+            QLabel *bitrateLabel=new QLabel(bitrate);
+            QLabel *channelsLabel=new QLabel(channels);
+            QLabel *sampleRateLabel=new QLabel(sampleRate);
+            titleLayout->addWidget(bitrateLabel);
+            titleLayout->addWidget(channelsLabel);
+            titleLayout->addWidget(sampleRateLabel);
+        }
         else
         {
             musicTable->removeRow(currentRow);
