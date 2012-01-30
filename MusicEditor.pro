@@ -20,7 +20,20 @@ SOURCES += main.cpp\
     meaudiodecoder.cpp \
     meauidoencoder.cpp \
     plot.cpp \
-    asynchronous_decode.cpp
+    asynchronous_decode.cpp \
+    QWave2/WaveformVRuler.cc \
+    QWave2/WaveformSelectionProxy.cc \
+    QWave2/WaveformScrollBar.cc \
+    QWave2/WaveformRuler.cc \
+    QWave2/WaveformRegion.cc \
+    QWave2/WaveformCursorProxy.cc \
+    QWave2/WaveformBar.cc \
+    QWave2/Waveform.cc \
+    QWave2/Utils.cc \
+    QWave2/TimeLabel.cc \
+#    QWave2/SndPlayerSunAudio.cc \
+    QWave2/SndFile.cc \
+    QWave2/Events.cc
 
 
 
@@ -33,8 +46,23 @@ HEADERS  += \
     qwt_headfile.h \
     plot.h \
     AudioData.h \
-    asynchronous_decode.h
+    asynchronous_decode.h \
+    QWave2/QWave2/WaveformVRuler.h \
+    QWave2/QWave2/WaveformSelectionProxy.h \
+    QWave2/QWave2/WaveformScrollBar.h \
+    QWave2/QWave2/WaveformRuler.h \
+    QWave2/QWave2/WaveformRegion.h \
+    QWave2/QWave2/WaveformCursorProxy.h \
+    QWave2/QWave2/WaveformBar.h \
+    QWave2/QWave2/Waveform.h \
+    QWave2/QWave2/Utils.h \
+    QWave2/QWave2/TimeLabel.h \
+    QWave2/QWave2/SndFile.h \
+    QWave2/QWave2/qwave2defs.h \
+    QWave2/QWave2/Exceptions.h \
+    QWave2/QWave2/Events.h
 
+INCLUDEPATH += ./QWave2/
 
 FORMS    +=
 
