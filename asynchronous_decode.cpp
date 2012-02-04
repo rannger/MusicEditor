@@ -39,7 +39,8 @@ void AsynchronousEncoder(QString file,MEAudioDecoder *decoder,int64_t time)
     if(ret!=0)
         goto END;
     encoder->encoder(decoder);
+    qDebug()<<"encode finish";
 END:
     encoder->release();
-    qDebug()<<"encode finish";
+    ;
 }

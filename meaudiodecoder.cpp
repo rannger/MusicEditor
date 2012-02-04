@@ -200,7 +200,11 @@ int MEAudioDecoder::SeekFrame(int64_t num)
 {
     double timestamp=(double)num;
     timestamp/=1000;
+#ifdef UNIX
     return av_seek_frame(infmt_ctx,-1,int64_t(timestamp*AV_TIME_BASE),AVSEEK_FLAG_FRAME);
+#else
+    return av_seek_frame(infmt_ctx,-1,int64_t(timestamp*AV_TIME_BASE),AVSEEK_FLAG_ANY);
+#endif
 }
 
 int MEAudioDecoder::initWithFile(const QString& fileName)

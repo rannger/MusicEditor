@@ -199,8 +199,8 @@ int MEAuidoEncoder::OpenFile(const QString& fileName,int samples_rate,int channe
 
     /* 如果输出文件不存在, 则创建输出文件 */
     if (!(outfmt->flags & AVFMT_NOFILE)) {
-            if (url_fopen(&outfmt_ctx->pb, output_file, URL_WRONLY) < 0) {
-                    printf("Could not open '%s'\n", output_file);
+            if (url_fopen(&outfmt_ctx->pb, fileName.toLocal8Bit().data(), URL_WRONLY) < 0) {
+                    qDebug("Could not open '%s'\n", output_file);
                     return -11;
             }
     }
