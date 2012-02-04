@@ -19,7 +19,6 @@ SOURCES += main.cpp\
     ffmpeg.cpp \
     meaudiodecoder.cpp \
     meauidoencoder.cpp \
-    plot.cpp \
     asynchronous_decode.cpp \
     QWave2/WaveformVRuler.cc \
     QWave2/WaveformSelectionProxy.cc \
@@ -31,9 +30,9 @@ SOURCES += main.cpp\
     QWave2/Waveform.cc \
     QWave2/Utils.cc \
     QWave2/TimeLabel.cc \
-#    QWave2/SndPlayerSunAudio.cc \
     QWave2/SndFile.cc \
-    QWave2/Events.cc
+    QWave2/Events.cc \
+    mebaseobject.cpp
 
 
 
@@ -43,8 +42,6 @@ HEADERS  += \
     meauidoencoder.h \
     debug_string.h \
     ffmpeg.h \
-    qwt_headfile.h \
-    plot.h \
     AudioData.h \
     asynchronous_decode.h \
     QWave2/QWave2/WaveformVRuler.h \
@@ -60,7 +57,8 @@ HEADERS  += \
     QWave2/QWave2/SndFile.h \
     QWave2/QWave2/qwave2defs.h \
     QWave2/QWave2/Exceptions.h \
-    QWave2/QWave2/Events.h
+    QWave2/QWave2/Events.h \
+    mebaseobject.h
 
 INCLUDEPATH += ./QWave2/
 
@@ -74,7 +72,6 @@ DEFINES += UNIX
 
 LIBS += -L /usr/lib/ -lqwt-qt4
 
-INCLUDEPATH += /usr/include/qwt-qt4/
 
 LIBS += -L/usr/lib -lswscale
 

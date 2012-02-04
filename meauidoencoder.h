@@ -18,8 +18,9 @@
 #define MEAUIDOENCODER_H
 #include <QtCore>
 #include "ffmpeg.h"
+#include "mebaseobject.h"
 class MEAudioDecoder;
-class MEAuidoEncoder
+class MEAuidoEncoder:public MEBaseObject
 {
 public:
     MEAuidoEncoder();

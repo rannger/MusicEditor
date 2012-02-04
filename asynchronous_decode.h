@@ -18,11 +18,11 @@
 #define ASYNCHRONOUS_DECODE_H
 #include "meaudiodecoder.h"
 #include "meauidoencoder.h"
-#include "plot.h"
+
 #include <QtCore>
 #include <QDebug>
 
-extern QVector<double> AsynchronousDecoder(QString file,MEAudioDecoder *decoder);
+extern  QVector<short> AsynchronousDecoder(QString file,MEAudioDecoder *decoder);
 extern void AsynchronousEncoder(QString file,MEAudioDecoder *decoder,int64_t time);
 
 #endif // ASYNCHRONOUS_DECODE_H

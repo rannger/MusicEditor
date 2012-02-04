@@ -66,7 +66,7 @@ public:
 	   double dur=60.0,
 	   QWidget *parent=NULL);
   ~Waveform();
-
+  ;
   /**
      The Waveform class manages two types of QCanvasItems: WaveformBar and
      WaveformRegion.  RTTI (RunTime Type Information) is used to distinguish
@@ -361,6 +361,7 @@ private:
 
   void adjustCanvasItems();
   void flushWaveform();
+
 };
 
 

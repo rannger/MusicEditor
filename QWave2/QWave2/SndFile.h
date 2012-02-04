@@ -10,7 +10,8 @@
 #include <string>
 #include <QWave2/qwave2defs.h>
 using namespace std;
-
+class MEAudioDecoder;
+class MEAuidoEncoder;
 
 namespace QWave2 {
 
@@ -68,8 +69,9 @@ public:
      Otherwise, it's rarely necessary to change the default value (120).
   */
   SndFile(char const * filename, int cacheSize=MAXCACHEPAGES);
+  SndFile(MEAudioDecoder* aDecoder,int numCPages=MAXCACHEPAGES);
   virtual ~SndFile();
-
+      QVector< short > data;
   /**
      @param waveform   A Waveform object whose drawing area will be painted
      with the waveform of the region specified by the channel, beg and dur
@@ -112,7 +114,7 @@ public:
   virtual double
   getLengthSeconds();
 
-  //unsigned long long getFrames();
+  unsigned long long getFrames();
 
   /**
      @return The sound file name.  This is the same string as the one that
@@ -129,8 +131,11 @@ protected:
 
 private:
   string _filename;
+
 //  SNDFILE* _sndfile;
 //  SF_INFO _sfinfo;
+  MEAudioDecoder* decoder;
+  
 
   size_t _numCPages;
   short** _cache;

@@ -13,20 +13,33 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 **************************************************************************/
-#ifndef PLOT_H
-#define PLOT_H
-#include "qwt_headfile.h"
-#include <stdint.h>
 
-class Plot : public QwtPlot
+#include "mebaseobject.h"
+
+MEBaseObject::MEBaseObject()
 {
-    Q_OBJECT
-public:
-    explicit Plot(QWidget *parent = 0);
-    void update(const QVector<double> &data);
-    bool isPainted;
-private:
-    QwtPlotCurve* plotCurve;
-};
+    referenceCount=1;
+}
 
-#endif // PLOT_H
+MEBaseObject::~MEBaseObject()
+{
+}
+
+void MEBaseObject::release()
+{
+    if(this->referenceCount==0)
+    {
+        delete this;
+    }
+}
+
+int MEBaseObject::retainCount()
+{
+    return referenceCount;
+}
+
+MEBaseObject* MEBaseObject::retain()
+{
+    referenceCount++;
+    return this;
+}

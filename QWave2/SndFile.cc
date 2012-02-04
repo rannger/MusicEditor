@@ -3,6 +3,8 @@
 #include "QWave2/Exceptions.h"
 #include <limits.h>
 #include <cmath>
+#include "meaudiodecoder.h"
+#include "meauidoencoder.h"
 
 namespace QWave2 {
 
@@ -10,29 +12,56 @@ SndFile::SndFile(char const * filename, int numCPages)
   : _filename(filename),
     _numCPages(numCPages<=0 ? 120: numCPages)
 {
+    decoder=new MEAudioDecoder();
+    if(decoder->initWithFile(QString(filename))<0)
+    {
+	throw SoundFileOpenError(QString("can't open '")+filename+"'");
+    }
+    else
+    {
+        int channels=decoder->getChannels();
+        int samplerate=decoder->getSampleRate();
+          _cache = new short*[_numCPages];
+          for (size_t i=0; i<_numCPages; ++i) {
+              _cache[i] = new short[channels*samplerate];
+              _unusedCPages.push_back(i);
+          }
+    }
 //  _sndfile = sf_open(filename, SFM_READ, &_sfinfo);
 //  if (!_sndfile)
 //    throw SoundFileOpenError(QString("can't open '")+filename+"'");
-  
-//  _cache = new short*[_numCPages];
-//  for (size_t i=0; i<_numCPages; ++i) {
-//    _cache[i] = new short[channels*samplerate];
-//    _unusedCPages.push_back(i);
-//  }
+}
+
+
+SndFile::SndFile(MEAudioDecoder* aDecoder,int numCPages)
+    :_numCPages(numCPages<=0 ? 120: numCPages)
+{
+    this->decoder=static_cast<MEAudioDecoder*>(aDecoder->retain());
+    int channels=decoder->getChannels();
+    int samplerate=decoder->getSampleRate();
+      _cache = new short*[_numCPages];
+      for (size_t i=0; i<_numCPages; ++i) {
+          _cache[i] = new short[channels*samplerate];
+          _unusedCPages.push_back(i);
+      }
+
 }
 
 SndFile::SndFile()
-{}
+{
+    decoder = 0;
+}
 
 SndFile::~SndFile()
 {
-//  if (!_filename.empty()) {
-//    for (size_t i=0; i<_numCPages; ++i)
-//      delete[] _cache[i];
-//    delete[] _cache;
+  if (!_filename.empty()) {
+    for (size_t i=0; i<_numCPages; ++i)
+      delete[] _cache[i];
+    delete[] _cache;
 
 //    sf_close(_sndfile);
-//  }
+  }
+    decoder->release();
 }
 
 void
@@ -44,16 +73,16 @@ SndFile::drawWaveform(Waveform* wave,
   if (wave->getPaintDevice()->height() == 0 ||
       wave->getPaintDevice()->width() == 0)
       return;
-  int samplerate=0;
-  int channels=2;
-  int bitrate=0;
-  int frames=0;
+  int samplerate=this->getSampleRate();
+  int channels=this->getChannels();
+
+  unsigned long long frames=this->getFrames();
   int s = (int)nearbyint(beg * samplerate);     // first sample
   int e = (int)nearbyint((beg+dur)*samplerate); // sample limit
 
-  if (ch < 0 or
-      ch >= channels or
-      e <= 0 or
+  if (ch < 0 ||
+      ch >= channels ||
+      e <= 0 ||
       s >= frames)
     return;
 
@@ -83,7 +112,7 @@ SndFile::drawWaveform(Waveform* wave,
   #endif
   int upage;
   list<int>::iterator pos;
-
+  int tTemp=0;
   for (i=0, k=k1; k<k2; ++i, ++k) {
     if (_index.find(k)==_index.end()) {
       // cache miss!
@@ -103,10 +132,12 @@ SndFile::drawWaveform(Waveform* wave,
       }
 
       // load page k
-//      sf_seek(_sndfile, k*samplerate, SEEK_SET);
-//      sf_readf_short(_sndfile, _cache[upage], samplerate);
-//      _index[k] = upage;
-//      _heap.push_back(k);
+
+      const short* sdata=data.constData();
+      memcpy(_cache[upage],&sdata[k*samplerate],samplerate);
+
+      _index[k] = upage;
+      _heap.push_back(k);
     }
     else {
       upage = _index[k];
@@ -119,20 +150,21 @@ SndFile::drawWaveform(Waveform* wave,
 
   starts[0] = s1 % samplerate;
   ends[m-1] = e1;
-
+  qDebug()<<"k1="<<k2;
   // draw
   int f = s1;
   short *p = _cache[cpages[0]] + starts[0]*channels + ch;
   QPainter painter(wave->getPaintDevice());
   double r = wave->getPixelsPerFrame();
-  double h = wave->getAmplitudeRatio() * wave->getHeightPixels() / 2.0 / SHRT_MAX;
-  int center = wave->getHeightPixels() / 2;
+  const double h = wave->getAmplitudeRatio() * wave->getHeightPixels() / 2.0 / SHRT_MAX;
+  const int center = wave->getHeightPixels() / 2;
 
   double pps = wave->getPixelsPerSecond();
   double spp = wave->getSecondsPerPixel();
   double t0 = wave->getBeginSeconds();
 
-  //qDebug("%f", r);
+//  qDebug("%f", r);
+
   if (r<1.0) {
     int x;
     if (s != s1)
@@ -148,41 +180,52 @@ SndFile::drawWaveform(Waveform* wave,
     for (k=0; k<m; ++k) {
       p = _cache[cpages[k]] + starts[k]*channels + ch;
       while (f1 <= ends[k]) {
-	if (new_pixel) {
-	  new_pixel = false;
-	  if (*p < min or *p > max)
-	    painter.drawLine(x,(int)nearbyint(center-h*y0),x,(int)nearbyint(center-h*(*p)));
-	  min = max = *p;
-	}
+        if (new_pixel) {
+          new_pixel = false;
+          if (*p < min || *p > max)
+          {
+            painter.drawLine(x,(int)nearbyint(center-h*y0),x,(int)nearbyint(center-h*(*p)));
+//            qDebug()<<__FILE__<<","<<__LINE__<<(int)nearbyint(center-h*y0)<<(int)nearbyint(center-h*(*p));
+          }
+          min = max = *p;
+        }
         for (; f<f1; ++f, p+=channels) {
-	  if (min > *p)
-	    min = *p;
-	  else if (max < *p)
-	    max = *p;
-	}
-	// draw line here!
-	painter.drawLine(x,(int)nearbyint(center-h*min),x,(int)nearbyint(center-h*max));
-	++x;
-	new_pixel = true;
-	t1 += spp;
+          if (min > *p)
+            min = *p;
+          else if (max < *p)
+            max = *p;
+        }
+        // draw line here!
+
+            painter.drawLine(x,(int)nearbyint(center-h*min),x,(int)nearbyint(center-h*max));
+         qDebug()<<__FILE__<<","<<__LINE__<<(int)nearbyint(center-h*min)<<(int)nearbyint(center-h*max);
+        ++x;
+        new_pixel = true;
+        t1 += spp;
         f1 = (int)nearbyint(t1 * samplerate);
         y0 = *(p-channels);
       } // end of while
       if (f < ends[k]) {
-	new_pixel = false;
-	if (*p < min or *p > max)
-	  painter.drawLine(x,(int)nearbyint(center-h*y0),x,(int)nearbyint(center-h*(*p)));
-	min = max = *p;
+        new_pixel = false;
+        if (*p < min or *p > max)
+        {
+          painter.drawLine(x,(int)nearbyint(center-h*y0),x,(int)nearbyint(center-h*(*p)));
+          qDebug()<<__FILE__<<","<<__LINE__<<(int)nearbyint(center-h*y0)<<(int)nearbyint(center-h*(*p));
+      }
+        min = max = *p;
         for (; f<ends[k]; ++f, p+=channels) {
-	  if (min > *p)
-	    min = *p;
-	  else if (max < *p)
-	    max = *p;
-	}
+          if (min > *p)
+            min = *p;
+          else if (max < *p)
+            max = *p;
+        }
       } // end of if
     }   // end of outermost for
     if (!new_pixel)
+    {
+     qDebug()<<__FILE__<<","<<__LINE__<<(int)nearbyint(center-h*min)<<(int)nearbyint(center-h*max);
       painter.drawLine(x,(int)nearbyint(center-h*min),x,(int)nearbyint(center-h*max));
+    }
   }
   else {
     //double x0 = wave->getBeginPixels();
@@ -193,20 +236,23 @@ SndFile::drawWaveform(Waveform* wave,
       p = _cache[cpages[k]] + starts[k]*channels + ch;
       for (; f<ends[k]; ++f, p+=channels) {
         x1 = ((double)f/samplerate - t0) * pps;
-	x = (int)trunc(x1);
-	y = center - (int)nearbyint(*p * h);
-	painter.drawLine(x,y0,x,y);
-	painter.drawLine(x,y,(int)trunc(x1+r),y);
-	y0 = y;
+        x = (int)trunc(x1);
+        y = center - (int)nearbyint(*p * h);
+        painter.drawLine(x,y0,x,y);
+        qDebug()<<__FILE__<<","<<__LINE__<<x;
+        painter.drawLine(x,y,(int)trunc(x1+r),y);
+        qDebug()<<__FILE__<<","<<__LINE__<<x;
+        y0 = y;
       }
     }
   }
+
 }
 
 int
 SndFile::getChannels()
 {
-    int retval=0;
+    int retval=decoder->getChannels();
     return retval;
 //  return channels;
 }
@@ -214,18 +260,18 @@ SndFile::getChannels()
 int
 SndFile::getSampleRate()
 {
-    int retval=0;
+    int retval=decoder->getSampleRate();
     return retval;
 //  return samplerate;
 }
 
-/*
 unsigned long long
 SndFile::getFrames()
 {
-  return frames;
+    unsigned long long frames=decoder->getNumberOfFrame();
+
+    return frames;
 }
-*/
 
 double
 SndFile::getLengthSeconds()

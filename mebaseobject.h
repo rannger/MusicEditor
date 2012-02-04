@@ -13,15 +13,20 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 **************************************************************************/
-#ifndef QWT_HEADFILE_H
-#define QWT_HEADFILE_H
-#include <qapplication.h>
-#include <qwt_plot.h>
-#include <qwt_plot_marker.h>
-#include <qwt_plot_curve.h>
-#include <qwt_legend.h>
-#include <qwt_data.h>
-#include <qwt_text.h>
-#include <qwt_math.h>
-#include <math.h>
-#endif // QWT_HEADFILE_H
+
+#ifndef MEBASEOBJECT_H
+#define MEBASEOBJECT_H
+
+class MEBaseObject
+{
+public:
+    MEBaseObject();
+    virtual ~MEBaseObject();
+    void release();
+    int retainCount();
+    MEBaseObject* retain();
+private:
+    int referenceCount;
+};
+
+#endif // MEBASEOBJECT_H

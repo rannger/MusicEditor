@@ -42,18 +42,37 @@ int MEAudioDecoder::init()
     incode_ctx=NULL;
     infmt_ctx=NULL;
     successFlag=-1;
+    numberOfFrames=0;
     return 0;
 }
+
+int MEAudioDecoder::getNumberOfFrame()
+{
+    int retval=0;
+
+    retval=incode_ctx->frame_number/*infmt_ctx->streams[this->audioindex]->nb_frames*/;
+    retval*=1000;
+    return retval;
+}
+
+
 
 void MEAudioDecoder::dealloc()
 {
     if(incode_ctx)
+    {
         avcodec_close(incode_ctx);
+        incode_ctx=NULL;
+    }
     if(infmt_ctx)
+    {
         av_close_input_file(infmt_ctx);
+        infmt_ctx=NULL;
+    }
     fileName[0]='\0';
 }
-int MEAudioDecoder::decoder(QVector<double>& retData)
+
+int MEAudioDecoder::decoder(QVector< short >& retData)
 {
     AVPacket packet;
     av_init_packet(&packet);
@@ -73,6 +92,66 @@ int MEAudioDecoder::decoder(QVector<double>& retData)
     {
         if(packet.stream_index == audioindex)
         {
+                numberOfFrames++;
+                pktsize = packet.size;
+                pktdata = packet.data;
+
+                if (pktsize > 0)
+                {
+                        //if(&packet)
+                        //samples=(short *)av_fast_realloc(samples,&samples_size,FFMAX(packet.size*sizeof(*samples),AVCODEC_MAX_AUDIO_FRAME_SIZE));
+                        samples_size_ptr = AVCODEC_MAX_AUDIO_FRAME_SIZE;
+                        len = avcodec_decode_audio2(incode_ctx, samples, &samples_size_ptr, pktdata, pktsize);//若为音频包，解码该音频包
+//                                printf("source frame number：%d\n", incode_ctx->frame_number);
+                        if(len <0)
+                        {
+                                debug_string("while decode audio failure\n");
+                                break;
+                        };
+
+                        if(samples_size_ptr <= 0)
+                        {
+                                debug_string("samples_size_ptr small than0");
+                                continue;
+                        }
+                        else
+                        {
+                            for(int index=0;index<samples_size_ptr;index++)
+                            {
+                                int16_t data=samples[index];
+                                retData.push_back(data);
+                            }
+                        }
+                }
+          }
+                av_free_packet(&packet);
+    }
+    av_free(samples);
+    av_free(audio_outbuf);
+    return 0;
+}
+int MEAudioDecoder::decoder(QVector<double>& retData)
+{
+    AVPacket packet;
+    av_init_packet(&packet);
+    int pktsize;
+    uint8_t* pktdata=NULL;
+
+    int audio_outbuf_size = AVCODEC_MAX_AUDIO_FRAME_SIZE; //FF_MIN_BUFFER_SIZE; //outSampleSize;//inputSampleSize;//
+    uint8_t *audio_outbuf = (uint8_t *)av_malloc(audio_outbuf_size); // *2 * oAcc->channels);
+
+    int samples_size_ptr = AVCODEC_MAX_AUDIO_FRAME_SIZE;
+    short *samples = (short*)av_malloc(AVCODEC_MAX_AUDIO_FRAME_SIZE);
+    retData.empty();
+    int len;
+    int retval=0;
+    int test=0;
+    while(readFrame(packet)>=0)
+    {
+
+        if(packet.stream_index == audioindex)
+        {
+                numberOfFrames++;
                 pktsize = packet.size;
                 pktdata = packet.data;
 

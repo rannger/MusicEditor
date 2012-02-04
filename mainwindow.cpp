@@ -18,12 +18,21 @@
 #include "mainwindow.h"
 #include "meaudiodecoder.h"
 #include "meauidoencoder.h"
-#include "plot.h"
 #include "asynchronous_decode.h"
 #include <assert.h>
+#include "QWave2/Waveform.h"
+#include "QWave2/WaveformVRuler.h"
+#include <QWave2/SndFile.h>
+#include <QWave2/Waveform.h>
+#include <QWave2/WaveformScrollBar.h>
+#include <QWave2/WaveformRuler.h>
+#include <QWave2/WaveformCursorProxy.h>
+#include <QWave2/WaveformSelectionProxy.h>
+#include <QWave2/TimeLabel.h>
 
 
-QFutureWatcher< QVector<double> > *MainWindow::decoderWatcher=NULL;
+
+QFutureWatcher< QVector<short> > *MainWindow::decoderWatcher=NULL;
 QFutureWatcher<void> *MainWindow::encoderWatcher=NULL;
 //![0]
 MainWindow::MainWindow()
@@ -49,10 +58,11 @@ MainWindow::MainWindow()
     Phonon::createPath(mediaObject, audioOutput);
 //![1]
 //    decoder=new MEAudioDecoder();
+
     setupActions();
     setupMenus();
     setupUi();
-    decoderWatcher=new QFutureWatcher< QVector<double> >(this);
+    decoderWatcher=new QFutureWatcher< QVector< short > >(this);
     encoderWatcher=new QFutureWatcher<void>(this);
     connect(decoderWatcher,SIGNAL(resultReadyAt(int)),this,SLOT(showCurve(int)));
     previousRow=-1;
@@ -73,7 +83,7 @@ MainWindow::~MainWindow()
     for( it = decoders.begin();  it != decoders.end();  ++it)
     {
         MEAudioDecoder* decoder=(MEAudioDecoder*)it.value();
-        delete decoder;
+        decoder->release();
     }
 
 
@@ -216,12 +226,10 @@ void MainWindow::tableClicked(int row, int /* column */)
 
     mediaObject->setCurrentSource(sources[row]);
 
-    Plot* plot=dynamic_cast<Plot*>(musicTable->cellWidget(row,1));
     MEAudioDecoder* decoder=decoders[row];
 //    decoder->dealloc();
 //    decoder->OpenFile(sources[row].fileName());
-    if(plot&&!plot->isPainted)
-        decoderWatcher->setFuture(QtConcurrent::run(AsynchronousDecoder,sources[row].fileName(),decoder));
+
     if (wasPlaying)
         mediaObject->play();
     else
@@ -267,6 +275,7 @@ void MainWindow::metaStateChanged(Phonon::State newState, Phonon::State /* oldSt
     titleWidget->setLayout(titleLayout);
 
 
+
     titleItem->setFlags(titleItem->flags() ^ Qt::ItemIsEditable);
 
     int currentRow = musicTable->rowCount();
@@ -276,10 +285,11 @@ void MainWindow::metaStateChanged(Phonon::State newState, Phonon::State /* oldSt
     musicTable->setCellWidget(currentRow,0,titleWidget);
     QString file=metaInformationResolver->currentSource().fileName();
     MEAudioDecoder* decoder=new MEAudioDecoder();
-    decoders.insert(currentRow,decoder);
+    decoders.insert(currentRow,static_cast<MEAudioDecoder*>(decoder));
     decoderWatcher->setFuture(QtConcurrent::run(AsynchronousDecoder,file,decoder));
-    Plot* plot=new Plot(musicTable);
-    musicTable->setCellWidget(currentRow,1,plot);
+    QWidget *waveFormWidget=new QWidget(musicTable);
+//    Plot* plot=new Plot(musicTable);
+    musicTable->setCellWidget(currentRow,1,waveFormWidget);
 
     if (musicTable->selectedItems().isEmpty()) {
         musicTable->selectRow(0);
@@ -435,19 +445,35 @@ void MainWindow::showCurve(int num)
 {
     int currentRow=this->justPaintRow;
     currentRow=currentRow<0?0:currentRow;
-    Plot* plot=dynamic_cast<Plot*>(musicTable->cellWidget(currentRow,1));
+    QWidget* waveFromWidget=dynamic_cast<QWidget*>(musicTable->cellWidget(currentRow,1));
+    QGridLayout* grid= new QGridLayout();
+    QVector< short > result=decoderWatcher->resultAt(num);
+
     QWidget *titleWidget =dynamic_cast<QWidget*>(musicTable->cellWidget(currentRow,0));
     QVBoxLayout *titleLayout =dynamic_cast<QVBoxLayout*>(titleWidget->layout());
+    MEAudioDecoder* decoder=decoders[num];
+    QWave2::WaveformRuler* ruler = new QWave2::WaveformRuler(true, this);
+    QWave2::SndFile* sndFile=new QWave2::SndFile(static_cast<MEAudioDecoder*>(decoder));
+    sndFile->data=result;
+    QWave2::Waveform *waveForm=new QWave2::Waveform(sndFile,0,0.0,60,waveFromWidget);
+    QWave2::WaveformVRuler *r = new QWave2::WaveformVRuler(waveFromWidget);
 
-
-    if(plot)
+//    waveFromWidget->setLayout(grid);
+    if(waveForm)
     {
-        QVector<double> result=decoderWatcher->resultAt(num);
+
+        r->connectToWaveform(waveForm);
+        ruler->connectToWaveform(waveForm);
+        grid->addWidget(ruler,0,1);
+        grid->addWidget(waveForm,1,2);
+        grid->addWidget(r,1,1);
+        waveForm->show();
+        r->show();
+        ruler->show();
+
+
         if(result.count())
         {
-            plot->update(result);
-            MEAudioDecoder* decoder=decoders[num];
-
             QString bitrate=QString("Bitrate:").append(QString::number(decoder->getBitRate()));
             QString channels=QString("Channels:").append(QString::number(decoder->getChannels()));
             QString sampleRate=QString("SampleRate:").append(QString::number(decoder->getSampleRate()));
@@ -457,6 +483,7 @@ void MainWindow::showCurve(int num)
             titleLayout->addWidget(bitrateLabel);
             titleLayout->addWidget(channelsLabel);
             titleLayout->addWidget(sampleRateLabel);
+            waveFromWidget->setLayout(grid);
         }
         else
         {
@@ -464,6 +491,7 @@ void MainWindow::showCurve(int num)
             sources.removeAt(currentRow);
             metaInformationResolver->clearQueue();
             mediaObject->clearQueue();
+            decoders[currentRow]->release();
             this->decoders.remove(currentRow);
             QMessageBox::information(this, tr("Alert"),
                 tr("Fail to open the file"));

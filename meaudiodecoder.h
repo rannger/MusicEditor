@@ -18,8 +18,8 @@
 #define MEAUDIODECODER_H
 #include <QtCore>
 #include "ffmpeg.h"
-
-class MEAudioDecoder
+#include "mebaseobject.h"
+class MEAudioDecoder:public MEBaseObject
 {
 public:
     MEAudioDecoder();
@@ -35,19 +35,21 @@ public:
     int getSampleRate();
     int getBitRate();
     int getChannels();
+    int getNumberOfFrame();
     QString getFileName();
     int getAudioIndex(){return audioindex;}
     int decoder(QVector<double>& retData);
     int SeekFrame(int64_t num=0);
     int getSuccessFlag();
+    int decoder(QVector< short >& retData);
 private:
     char fileName[FILENAME_MAX];
     AVFormatContext *infmt_ctx;
     AVCodecContext *incode_ctx;
     AVCodec *incodec;
     int audioindex;
-
     int successFlag;
+    int numberOfFrames;
 };
 
 #endif // MEAUDIODECODER_H

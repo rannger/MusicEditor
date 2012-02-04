@@ -91,7 +91,7 @@ private:
     int justPaintRow;
     QMap<int,MEAudioDecoder*> decoders;
 public:
-    static QFutureWatcher< QVector<double> > *decoderWatcher;
+    static QFutureWatcher< QVector< short > > *decoderWatcher;
     static QFutureWatcher<void> *encoderWatcher;
 };
 
