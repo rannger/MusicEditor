@@ -455,7 +455,7 @@ void MainWindow::showCurve(int num)
     QWave2::WaveformRuler* ruler = new QWave2::WaveformRuler(true, this);
     QWave2::SndFile* sndFile=new QWave2::SndFile(static_cast<MEAudioDecoder*>(decoder));
     sndFile->data=result;
-    QWave2::Waveform *waveForm=new QWave2::Waveform(sndFile,0,0.0,60,waveFromWidget);
+    QWave2::Waveform *waveForm=new QWave2::Waveform(sndFile,0,0.0,mediaObject->totalTime()/1000,waveFromWidget);
     QWave2::WaveformVRuler *r = new QWave2::WaveformVRuler(waveFromWidget);
 
 //    waveFromWidget->setLayout(grid);

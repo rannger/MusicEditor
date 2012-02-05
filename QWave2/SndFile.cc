@@ -58,8 +58,6 @@ SndFile::~SndFile()
     for (size_t i=0; i<_numCPages; ++i)
       delete[] _cache[i];
     delete[] _cache;
-
-//    sf_close(_sndfile);
   }
     decoder->release();
 }
@@ -76,7 +74,7 @@ SndFile::drawWaveform(Waveform* wave,
   int samplerate=this->getSampleRate();
   int channels=this->getChannels();
 
-  unsigned long long frames=this->getFrames();
+  unsigned long long frames=getFrames();
   int s = (int)nearbyint(beg * samplerate);     // first sample
   int e = (int)nearbyint((beg+dur)*samplerate); // sample limit
 
@@ -93,6 +91,7 @@ SndFile::drawWaveform(Waveform* wave,
     return;
 
   int k1 = s1 / samplerate;         // first page
+
   int k2 = (int)ceil((double)e1/samplerate); // page limit
   if (k2 - k1 > (int) _numCPages) {
     k2 = k1 + _numCPages;
@@ -112,7 +111,7 @@ SndFile::drawWaveform(Waveform* wave,
   #endif
   int upage;
   list<int>::iterator pos;
-  int tTemp=0;
+
   for (i=0, k=k1; k<k2; ++i, ++k) {
     if (_index.find(k)==_index.end()) {
       // cache miss!
@@ -134,6 +133,7 @@ SndFile::drawWaveform(Waveform* wave,
       // load page k
 
       const short* sdata=data.constData();
+
       memcpy(_cache[upage],&sdata[k*samplerate],samplerate);
 
       _index[k] = upage;
@@ -150,7 +150,7 @@ SndFile::drawWaveform(Waveform* wave,
 
   starts[0] = s1 % samplerate;
   ends[m-1] = e1;
-  qDebug()<<"k1="<<k2;
+
   // draw
   int f = s1;
   short *p = _cache[cpages[0]] + starts[0]*channels + ch;
@@ -185,7 +185,6 @@ SndFile::drawWaveform(Waveform* wave,
           if (*p < min || *p > max)
           {
             painter.drawLine(x,(int)nearbyint(center-h*y0),x,(int)nearbyint(center-h*(*p)));
-//            qDebug()<<__FILE__<<","<<__LINE__<<(int)nearbyint(center-h*y0)<<(int)nearbyint(center-h*(*p));
           }
           min = max = *p;
         }
@@ -197,9 +196,13 @@ SndFile::drawWaveform(Waveform* wave,
         }
         // draw line here!
 
-            painter.drawLine(x,(int)nearbyint(center-h*min),x,(int)nearbyint(center-h*max));
-         qDebug()<<__FILE__<<","<<__LINE__<<(int)nearbyint(center-h*min)<<(int)nearbyint(center-h*max);
-        ++x;
+
+         if(min&&max)
+         {
+             painter.drawLine(x,(int)(center-h*min),x,(int)(center-h*max));
+            ++x;
+         }
+
         new_pixel = true;
         t1 += spp;
         f1 = (int)nearbyint(t1 * samplerate);

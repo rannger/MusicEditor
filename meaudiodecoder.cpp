@@ -118,8 +118,12 @@ int MEAudioDecoder::decoder(QVector< short >& retData)
                         {
                             for(int index=0;index<samples_size_ptr;index++)
                             {
-                                int16_t data=samples[index];
-                                retData.push_back(data);
+                                if(samples[index]!=0)
+                                {
+                                    int16_t data=samples[index];
+                                    retData.push_back(data);
+                                }
+
                             }
                         }
                 }
