@@ -29,6 +29,7 @@
 #include <QWave2/WaveformCursorProxy.h>
 #include <QWave2/WaveformSelectionProxy.h>
 #include <QWave2/TimeLabel.h>
+#include "meunity.h"
 
 
 
@@ -267,12 +268,7 @@ void MainWindow::metaStateChanged(Phonon::State newState, Phonon::State /* oldSt
     titleItem=new QTableWidgetItem(metaInformationResolver->currentSource().fileName());
 
     QWidget *titleWidget=new QWidget(musicTable);
-    QVBoxLayout *titleLayout = new QVBoxLayout;
-    QLabel *titleLable=new QLabel(metaInformationResolver->currentSource().fileName());
 
-
-    titleLayout->addWidget(titleLable);
-    titleWidget->setLayout(titleLayout);
 
 
 
@@ -303,8 +299,6 @@ void MainWindow::metaStateChanged(Phonon::State newState, Phonon::State /* oldSt
     }
     else {
         musicTable->resizeColumnsToContents();
-//        if (musicTable->columnWidth(0) > 300)
-//            musicTable->setColumnWidth(0, 1000);
          musicTable->setColumnWidth(1, 900);
          musicTable->setColumnWidth(0, 300);
          musicTable->setRowHeight(currentRow,300);
@@ -446,56 +440,32 @@ void MainWindow::showCurve(int num)
     int currentRow=this->justPaintRow;
     currentRow=currentRow<0?0:currentRow;
     QWidget* waveFromWidget=dynamic_cast<QWidget*>(musicTable->cellWidget(currentRow,1));
-    QGridLayout* grid= new QGridLayout();
-    QVector< short > result=decoderWatcher->resultAt(num);
 
-    QWidget *titleWidget =dynamic_cast<QWidget*>(musicTable->cellWidget(currentRow,0));
-    QVBoxLayout *titleLayout =dynamic_cast<QVBoxLayout*>(titleWidget->layout());
     MEAudioDecoder* decoder=decoders[num];
-    QWave2::WaveformRuler* ruler = new QWave2::WaveformRuler(true, this);
     QWave2::SndFile* sndFile=new QWave2::SndFile(static_cast<MEAudioDecoder*>(decoder));
-    sndFile->data=result;
-    QWave2::Waveform *waveForm=new QWave2::Waveform(sndFile,0,0.0,mediaObject->totalTime()/1000,waveFromWidget);
-    QWave2::WaveformVRuler *r = new QWave2::WaveformVRuler(waveFromWidget);
+    sndFile->data=decoderWatcher->resultAt(num);
+    QWidget *titleWidget =dynamic_cast<QWidget*>(musicTable->cellWidget(currentRow,0));
+//    QVBoxLayout *titleLayout =dynamic_cast<QVBoxLayout*>(titleWidget->layout());
 
-//    waveFromWidget->setLayout(grid);
-    if(waveForm)
+    QGridLayout* grid=MEUnity::unity()->creatWaveFromPanel(sndFile,waveFromWidget);
+    QVBoxLayout* titleLayout=MEUnity::unity()->creatTitlePanel(decoder);
+
+    if(sndFile->data.count())
     {
 
-        r->connectToWaveform(waveForm);
-        ruler->connectToWaveform(waveForm);
-        grid->addWidget(ruler,0,1);
-        grid->addWidget(waveForm,1,2);
-        grid->addWidget(r,1,1);
-        waveForm->show();
-        r->show();
-        ruler->show();
-
-
-        if(result.count())
-        {
-            QString bitrate=QString("Bitrate:").append(QString::number(decoder->getBitRate()));
-            QString channels=QString("Channels:").append(QString::number(decoder->getChannels()));
-            QString sampleRate=QString("SampleRate:").append(QString::number(decoder->getSampleRate()));
-            QLabel *bitrateLabel=new QLabel(bitrate);
-            QLabel *channelsLabel=new QLabel(channels);
-            QLabel *sampleRateLabel=new QLabel(sampleRate);
-            titleLayout->addWidget(bitrateLabel);
-            titleLayout->addWidget(channelsLabel);
-            titleLayout->addWidget(sampleRateLabel);
-            waveFromWidget->setLayout(grid);
-        }
-        else
-        {
-            musicTable->removeRow(currentRow);
-            sources.removeAt(currentRow);
-            metaInformationResolver->clearQueue();
-            mediaObject->clearQueue();
-            decoders[currentRow]->release();
-            this->decoders.remove(currentRow);
-            QMessageBox::information(this, tr("Alert"),
-                tr("Fail to open the file"));
-        }
+        titleWidget->setLayout(titleLayout);
+        waveFromWidget->setLayout(grid);
+    }
+    else
+    {
+        musicTable->removeRow(currentRow);
+        sources.removeAt(currentRow);
+        metaInformationResolver->clearQueue();
+        mediaObject->clearQueue();
+        decoders[currentRow]->release();
+        this->decoders.remove(currentRow);
+        QMessageBox::information(this, tr("Alert"),
+            tr("Fail to open the file"));
     }
     justPaintRow=-1;
 }

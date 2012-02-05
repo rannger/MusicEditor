@@ -32,7 +32,8 @@ SOURCES += main.cpp\
     QWave2/TimeLabel.cc \
     QWave2/SndFile.cc \
     QWave2/Events.cc \
-    mebaseobject.cpp
+    mebaseobject.cpp \
+    meunity.cpp
 
 
 
@@ -58,7 +59,8 @@ HEADERS  += \
     QWave2/QWave2/qwave2defs.h \
     QWave2/QWave2/Exceptions.h \
     QWave2/QWave2/Events.h \
-    mebaseobject.h
+    mebaseobject.h \
+    meunity.h
 
 INCLUDEPATH += ./QWave2/
 
