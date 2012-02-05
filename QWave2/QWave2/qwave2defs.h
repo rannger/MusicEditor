@@ -22,11 +22,11 @@
 #endif 
 
 #ifdef _MSC_VER
-  #ifdef QWAVE_MAKE_DLL
-  #define DLLEXPORT __declspec(dllexport)
-  #else
-  #define DLLEXPORT __declspec(dllimport)
-  #endif
+#ifdef QWAVE_MAKE_DLL
+#define DLLEXPORT __declspec(dllexport)
+#else
+#define DLLEXPORT __declspec(dllimport)
+#endif
 #else
 #define DLLEXPORT
 #endif

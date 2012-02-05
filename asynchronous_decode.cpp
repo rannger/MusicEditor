@@ -18,8 +18,11 @@
 #include <assert.h>
  QVector<short> AsynchronousDecoder(QString file,MEAudioDecoder *decoder)
 {
-    decoder->dealloc();
-    decoder->OpenFile(file);
+
+    do{
+         decoder->dealloc();
+    }
+    while(decoder->OpenFile(file)<0);
     if(decoder->getSuccessFlag()<0)
         return QVector<short>();
     QVector<short> data;

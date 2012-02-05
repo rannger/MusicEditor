@@ -10,27 +10,27 @@ namespace QWave2 {
    TimeLabel is also a receiver of PlayerPositionEvent.  Therefore, if it
    is registered with SndPlayerTicker, it displayes the position of the
    player cursor in real-time.
- */
-class  TimeLabel: public QLabel
-{
-  Q_OBJECT
+*/
+        class  TimeLabel: public QLabel
+        {
+                Q_OBJECT
 
-public:
-  TimeLabel(QWidget* parent=0);
-  ~TimeLabel();
+                    public:
+                TimeLabel(QWidget* parent=0);
+                ~TimeLabel();
 
-public slots:
-  /**
-     @param t The time to be displayed on the label.
-   */
-  void setTime(double t);
+                public slots:
+                /**
+                   @param t The time to be displayed on the label.
+                */
+                void setTime(double t);
 
-protected:
-  /**
-     @param e The pointer to a PlayerPositionEvent instance.
-   */ 
-  void customEvent(QEvent* e);
-};
+        protected:
+                /**
+                   @param e The pointer to a PlayerPositionEvent instance.
+                */ 
+                void customEvent(QEvent* e);
+        };
 
 }
 

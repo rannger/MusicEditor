@@ -269,9 +269,6 @@ void MainWindow::metaStateChanged(Phonon::State newState, Phonon::State /* oldSt
 
     QWidget *titleWidget=new QWidget(musicTable);
 
-
-
-
     titleItem->setFlags(titleItem->flags() ^ Qt::ItemIsEditable);
 
     int currentRow = musicTable->rowCount();
@@ -446,8 +443,8 @@ void MainWindow::showCurve(int num)
     sndFile->data=decoderWatcher->resultAt(num);
     QWidget *titleWidget =dynamic_cast<QWidget*>(musicTable->cellWidget(currentRow,0));
 //    QVBoxLayout *titleLayout =dynamic_cast<QVBoxLayout*>(titleWidget->layout());
-
-    QGridLayout* grid=MEUnity::unity()->creatWaveFromPanel(sndFile,waveFromWidget);
+    qDebug()<<"Total time:"<<mediaObject->totalTime();
+    QGridLayout* grid=MEUnity::unity()->creatWaveFromPanel(sndFile,waveFromWidget,mediaObject->totalTime()/1000);
     QVBoxLayout* titleLayout=MEUnity::unity()->creatTitlePanel(decoder);
 
     if(sndFile->data.count())

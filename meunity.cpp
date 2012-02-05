@@ -39,10 +39,10 @@ MEUnity* MEUnity::unity()
     return MEUnity::_unity;
 }
 
-QGridLayout* MEUnity::creatWaveFromPanel(QWave2::SndFile* sndFile,QWidget* parent)
+QGridLayout* MEUnity::creatWaveFromPanel(QWave2::SndFile* sndFile,QWidget* parent,double time)
 {
     QGridLayout* grid= new QGridLayout();
-    QWave2::Waveform *waveForm=new QWave2::Waveform(sndFile,0,0.0,60,parent);
+    QWave2::Waveform *waveForm=new QWave2::Waveform(sndFile,0,0.0,time,parent);
     QWave2::WaveformVRuler *r = new QWave2::WaveformVRuler(parent);
     QWave2::WaveformScrollBar* waveformScrollBar = new QWave2::WaveformScrollBar(parent);
     QWave2::WaveformRuler* ruler = new QWave2::WaveformRuler(false, parent);

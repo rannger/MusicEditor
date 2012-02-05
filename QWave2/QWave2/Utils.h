@@ -6,7 +6,7 @@
 
 namespace QWave2 {
 
- QString time2str(double t, int e);
+        QString time2str(double t, int e);
 
 }
 

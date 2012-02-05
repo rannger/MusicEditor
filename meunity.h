@@ -24,7 +24,7 @@ class MEUnity
 {
 public:
     static MEUnity* unity();
-    QGridLayout* creatWaveFromPanel(QWave2::SndFile* sndFile,QWidget* parent);
+    QGridLayout* creatWaveFromPanel(QWave2::SndFile* sndFile,QWidget* parent,double time);
     QVBoxLayout* creatTitlePanel(MEAudioDecoder* decoder);
 private:
     static MEUnity* _unity;

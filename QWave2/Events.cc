@@ -2,16 +2,16 @@
 
 namespace QWave2 {
 
-PlayerPositionEvent::PlayerPositionEvent(double t)
-  : QEvent((QEvent::Type)PlayerPosition),
-    _t(t)
-{
-}
+    PlayerPositionEvent::PlayerPositionEvent(double t)
+        : QEvent((QEvent::Type)PlayerPosition),
+          _t(t)
+    {
+    }
 
-double
-PlayerPositionEvent::time() const
-{
-  return _t;
-}
+    double
+    PlayerPositionEvent::time() const
+    {
+        return _t;
+    }
 
 }

@@ -9,8 +9,8 @@ using namespace std;
 
 namespace QWave2 {
 
-class Waveform;
-class WaveformBar;
+        class Waveform;
+        class WaveformBar;
 
 /// WaveformCursorProxy manages waveform cursors on the registered waveforms.
 /**
@@ -29,68 +29,68 @@ class WaveformBar;
    The color scheme of the focused/unfocused cursors can be changed with
    the setColorScheme method.  The cursor position can be obtained using the
    getCursorPositionSeconds method.
- */
-class  WaveformCursorProxy: public QObject
-{
-  Q_OBJECT
+*/
+        class  WaveformCursorProxy: public QObject
+        {
+                Q_OBJECT
 
-public:
-  WaveformCursorProxy(QObject* parent=0);
-  ~WaveformCursorProxy();
+                    public:
+                WaveformCursorProxy(QObject* parent=0);
+                ~WaveformCursorProxy();
 
-  /**
-     @param wave Waveform to be registered.
+                /**
+                   @param wave Waveform to be registered.
 
-     Register the given waveform.
-   */
-  void registerWaveform(Waveform* wave);
-  /**
-     @param wave Waveform to be unregistered.
+                   Register the given waveform.
+                */
+                void registerWaveform(Waveform* wave);
+                /**
+                   @param wave Waveform to be unregistered.
 
-     Unregister the given waveform.
-   */
-  void unregisterWaveform(Waveform* wave);
-  /**
-     @return Current cursor position.
+                   Unregister the given waveform.
+                */
+                void unregisterWaveform(Waveform* wave);
+                /**
+                   @return Current cursor position.
 
-     Returns the current cursor position in seconds.
-   */
-  double getCursorPositionSeconds();
+                   Returns the current cursor position in seconds.
+                */
+                double getCursorPositionSeconds();
 
-public slots:
-  /**
-     @param wave The waveform to be the focused waveform.
-     @param beg The new cursor position.
+                public slots:
+                /**
+                   @param wave The waveform to be the focused waveform.
+                   @param beg The new cursor position.
 
-     Locate the cursors at beg on the registered waveforms.  The wave
-     parameter can be NULL.  In that case, no waveforms will get the
-     focused cursor.
-   */
-  void updateCursorPosition(Waveform* wave, double beg);
-  /**
-     @param focused Color of the focused cursor.
-     @param unfocused Color of the unfocused cursor.
+                   Locate the cursors at beg on the registered waveforms.  The wave
+                   parameter can be NULL.  In that case, no waveforms will get the
+                   focused cursor.
+                */
+                void updateCursorPosition(Waveform* wave, double beg);
+                /**
+                   @param focused Color of the focused cursor.
+                   @param unfocused Color of the unfocused cursor.
 
-     Change the color scheme of the cursors.
-   */
-  void setColorScheme(const QColor& focused, const QColor& unfocused);
+                   Change the color scheme of the cursors.
+                */
+                void setColorScheme(const QColor& focused, const QColor& unfocused);
 
-protected:
-  /**
-     Receive the PlayerPositionEvent event posted by SndPlayerTicker and
-     draw the player cursors.
-   */
-  void customEvent(QEvent*);
+        protected:
+                /**
+                   Receive the PlayerPositionEvent event posted by SndPlayerTicker and
+                   draw the player cursors.
+                */
+                void customEvent(QEvent*);
 
-private slots:
-  void waveformDestroyed(QObject* obj=0);
+                private slots:
+                void waveformDestroyed(QObject* obj=0);
 
-private:
-  map<Waveform*,WaveformBar*> _waves;
-  double _t;
-  QColor _focused;
-  QColor _unfocused;
-};
+        private:
+                map<Waveform*,WaveformBar*> _waves;
+                double _t;
+                QColor _focused;
+                QColor _unfocused;
+        };
 
 }
 
