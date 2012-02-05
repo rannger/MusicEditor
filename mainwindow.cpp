@@ -69,6 +69,7 @@ MainWindow::MainWindow()
     previousRow=-1;
     justPaintRow=-1;
     timeLcd->display("00:00");
+
 }
 
 MainWindow::~MainWindow()

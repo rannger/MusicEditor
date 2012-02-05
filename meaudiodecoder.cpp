@@ -16,6 +16,9 @@
 #include <QDebug>
 #include "meaudiodecoder.h"
 #include "debug_string.h"
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 MEAudioDecoder::MEAudioDecoder()
 {
@@ -116,14 +119,11 @@ int MEAudioDecoder::decoder(QVector< short >& retData)
                         }
                         else
                         {
+
                             for(int index=0;index<samples_size_ptr;index++)
                             {
-                                if(samples[index]!=0)
-                                {
-                                    int16_t data=samples[index];
-                                    retData.push_back(data);
-                                }
-
+                                int16_t data=samples[index];
+                                retData.push_back(data);
                             }
                         }
                 }

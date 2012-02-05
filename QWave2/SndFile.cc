@@ -194,13 +194,8 @@ namespace QWave2 {
 			    max = *p;
 		    }
 		    // draw line here!
-
-		    if(min&&max)
-		    {
-			painter.drawLine(x,(int)(center-h*min),x,(int)(center-h*max));
-			++x;
-		    }
-
+                    painter.drawLine(x,(int)(center-h*min),x,(int)(center-h*max));
+                    ++x;
 		    new_pixel = true;
 		    t1 += spp;
 		    f1 = (int)nearbyint(t1 * samplerate);
