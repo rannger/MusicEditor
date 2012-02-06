@@ -187,7 +187,7 @@ namespace QWave2 {
 			}
 			min = max = *p;
 		    }
-		    for (; f<f1; ++f, p+=channels) {
+                    for (; f<f1; ++f, p++/*=channels*/) {
 			if (min > *p)
 			    min = *p;
 			else if (max < *p)
@@ -208,7 +208,7 @@ namespace QWave2 {
 			painter.drawLine(x,(int)nearbyint(center-h*y0),x,(int)nearbyint(center-h*(*p)));
 		    }
 		    min = max = *p;
-		    for (; f<ends[k]; ++f, p+=channels) {
+                    for (; f<ends[k]; ++f, p++/*=channels*/) {
 			if (min > *p)
 			    min = *p;
 			else if (max < *p)
