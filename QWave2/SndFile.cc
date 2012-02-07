@@ -33,6 +33,7 @@ namespace QWave2 {
     SndFile::SndFile(MEAudioDecoder* aDecoder,int numCPages)
 	:_numCPages(numCPages<=0 ? 120: numCPages)
     {
+        _numCPages<<=3;
 	this->decoder=static_cast<MEAudioDecoder*>(aDecoder->retain());
 	int channels=decoder->getChannels();
 	int samplerate=decoder->getSampleRate();
@@ -73,23 +74,22 @@ namespace QWave2 {
 
 	unsigned long long frames=getFrames();
 	int s = (int)nearbyint(beg * samplerate);     // first sample
-	int e = (int)nearbyint((beg+dur)*samplerate); // sample limit
+        int e = (int)nearbyint(data.count()); // sample limit
 
 	if (ch < 0 ||
 	    ch >= channels ||
 	    e <= 0 ||
 	    s >= frames)
 	    return;
-	qDebug()<<"here:"<<dur;
         int s1 = (s < 0) ? 0 : s;
-        int e1 = (e > frames) ? frames : e;
+        int e1 = /*(e > frames) ? frames :*/ e;
 
 	if (s1 >= e1)
 	    return;
 
         int k1 = s1 / samplerate;         // first page
 
-	int k2 = (int)ceil((double)e1/samplerate); // page limit
+        int k2 = (int)ceil((double)e1/samplerate); // page limit
 	if (k2 - k1 > (int) _numCPages) {
 	    k2 = k1 + _numCPages;
 	    e1 = k2 * samplerate;
@@ -128,11 +128,14 @@ namespace QWave2 {
 		}
 
 		// load page k
+                if(t<data.count())
+                {
+                    const short* sdata=data.constData();
+                    qDebug()<<"total:"<<data.count();
+                    memcpy(_cache[upage],&sdata[k*samplerate],samplerate);
+                    qDebug()<<"now:"<<(t+=samplerate);
+                }
 
-		const short* sdata=data.constData();
-                qDebug()<<"Total num:"<<data.count();
-		memcpy(_cache[upage],&sdata[k*samplerate],samplerate);
-                qDebug()<<"samplerate:"<<(t+=samplerate);
 		_index[k] = upage;
 		_heap.push_back(k);
 	    }
@@ -183,19 +186,19 @@ namespace QWave2 {
 			if (*p < min || *p > max)
 			{
 			    painter.drawLine(x,(int)nearbyint(center-h*y0),x,(int)nearbyint(center-h*(*p)));
-
 			}
 			min = max = *p;
 		    }
-                    for (; f<f1; ++f, p++/*=channels*/) {
+                    for (; f<f1; ++f, p++) {
 			if (min > *p)
 			    min = *p;
-			else if (max < *p)
+                        if (max < *p)
 			    max = *p;
 		    }
 		    // draw line here!
                     painter.drawLine(x,(int)(center-h*min),x,(int)(center-h*max));
-                    ++x;
+                    if(max!=min)
+                        ++x;
 		    new_pixel = true;
 		    t1 += spp;
 		    f1 = (int)nearbyint(t1 * samplerate);
@@ -206,12 +209,13 @@ namespace QWave2 {
                     if (*p < min || *p > max)
 		    {
 			painter.drawLine(x,(int)nearbyint(center-h*y0),x,(int)nearbyint(center-h*(*p)));
+                        x++;
 		    }
 		    min = max = *p;
-                    for (; f<ends[k]; ++f, p++/*=channels*/) {
+                    for (; f<ends[k]; ++f, p++) {
 			if (min > *p)
 			    min = *p;
-			else if (max < *p)
+                        if (max < *p)
 			    max = *p;
 		    }
 		} // end of if
@@ -219,8 +223,8 @@ namespace QWave2 {
 	    if (!new_pixel)
 	    {
 		painter.drawLine(x,(int)nearbyint(center-h*min),x,(int)nearbyint(center-h*max));
+                x++;
 	    }
-            qDebug("at last %d=",x);
 	}
 	else {
 	    //double x0 = wave->getBeginPixels();
@@ -234,6 +238,7 @@ namespace QWave2 {
 		    x = (int)trunc(x1);
 		    y = center - (int)nearbyint(*p * h);
 		    painter.drawLine(x,y0,x,y);
+                    x++;
 		    qDebug()<<__FILE__<<","<<__LINE__<<x;
 		    painter.drawLine(x,y,(int)trunc(x1+r),y);
 		    qDebug()<<__FILE__<<","<<__LINE__<<x;
