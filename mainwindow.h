@@ -33,6 +33,7 @@ QT_END_NAMESPACE
 //![0]
 class Plot;
 class MEAudioDecoder;
+class Waveform;
 class MainWindow : public QMainWindow
 {
 //![0]
@@ -51,6 +52,8 @@ private slots:
     void addFiles();
     void about();
     void translateMusicFormat();
+    void changeSelection(double beg, double dur, Waveform*);
+    void setTime(Waveform*,double t);
 //![1]
     void stateChanged(Phonon::State newState, Phonon::State oldState);
     void tick(qint64 time);
@@ -89,6 +92,8 @@ private:
 //    MEAudioDecoder *decoder;
     int previousRow;
     int justPaintRow;
+    qint64 dur;
+    qint64 beg;
     QMap<int,MEAudioDecoder*> decoders;
 public:
     static QFutureWatcher< QVector< short > > *decoderWatcher;

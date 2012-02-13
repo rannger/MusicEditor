@@ -207,6 +207,8 @@ void MainWindow::tick(qint64 time)
     QTime displayTime(0, (time / 60000) % 60, (time / 1000) % 60);
 
     timeLcd->display(displayTime.toString("mm:ss"));
+    if(time>this->dur||time<this->beg)
+        this->mediaObject->pause();
 }
 //![11]
 
@@ -282,6 +284,7 @@ void MainWindow::metaStateChanged(Phonon::State newState, Phonon::State /* oldSt
     decoders.insert(currentRow,static_cast<MEAudioDecoder*>(decoder));
     decoderWatcher->setFuture(QtConcurrent::run(AsynchronousDecoder,file,decoder));
     QWidget *waveFormWidget=new QWidget(musicTable);
+    waveFormWidget->resize(1000,300);
 //    Plot* plot=new Plot(musicTable);
     musicTable->setCellWidget(currentRow,1,waveFormWidget);
 
@@ -297,9 +300,9 @@ void MainWindow::metaStateChanged(Phonon::State newState, Phonon::State /* oldSt
     }
     else {
         musicTable->resizeColumnsToContents();
-         musicTable->setColumnWidth(1, 900);
+        musicTable->setColumnWidth(1, 900);
          musicTable->setColumnWidth(0, 300);
-         musicTable->setRowHeight(currentRow,300);
+         musicTable->setRowHeight(currentRow,200);
     }
 }
 //![15]
@@ -407,7 +410,7 @@ void MainWindow::setupUi()
     musicTable->setEditTriggers ( QAbstractItemView::NoEditTriggers );
     connect(musicTable, SIGNAL(cellPressed(int,int)),
             this, SLOT(tableClicked(int,int)));
-    musicTable->setColumnWidth(1,1000);
+    musicTable->setColumnWidth(1,1200);
     QHBoxLayout *seekerLayout = new QHBoxLayout;
     seekerLayout->addWidget(seekSlider);
     seekerLayout->addWidget(timeLcd);
@@ -445,13 +448,13 @@ void MainWindow::showCurve(int num)
     QWidget *titleWidget =dynamic_cast<QWidget*>(musicTable->cellWidget(currentRow,0));
 //    QVBoxLayout *titleLayout =dynamic_cast<QVBoxLayout*>(titleWidget->layout());
     qDebug()<<"Total time:"<<mediaObject->totalTime();
-    QGridLayout* grid=MEUnity::unity()->creatWaveFromPanel(sndFile,waveFromWidget,mediaObject->totalTime()/1000);
+    QGridLayout* grid=MEUnity::unity()->creatWaveFromPanel(sndFile,this,mediaObject->totalTime()/1000);
     QVBoxLayout* titleLayout=MEUnity::unity()->creatTitlePanel(decoder);
 
     if(sndFile->data.count())
     {
-
         titleWidget->setLayout(titleLayout);
+
         waveFromWidget->setLayout(grid);
     }
     else
@@ -467,3 +470,18 @@ void MainWindow::showCurve(int num)
     }
     justPaintRow=-1;
 }
+
+void MainWindow::changeSelection(double beg, double dur, Waveform*)
+{
+    this->beg=beg*1000;
+    this->dur=dur*1000+this->beg;
+    mediaObject->seek((qint64)beg*1000);
+    mediaObject->play();
+}
+
+void
+MainWindow::setTime(Waveform*,double t)
+{
+
+}
+

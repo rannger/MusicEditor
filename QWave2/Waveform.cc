@@ -192,8 +192,8 @@ namespace QWave2 {
 	_waves[0] = new QPixmap(_width, _height);
 	_waves[1] = new QPixmap(_width, _height);
 
-	_pps = (double)_width / _dur;
-	_spp = (double)_dur / _width;
+        _pps = (double)_width / _dur;
+        _spp = (double)_dur / _width;
 
 	_waves[_waveidx]->fill();
 	_sndfile->drawWaveform(this,_channel,_beg, _dur);

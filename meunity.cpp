@@ -15,6 +15,7 @@
 **************************************************************************/
 
 #include "meunity.h"
+#include "mainwindow.h"
 #include <QtGui>
 #include "QWave2/Waveform.h"
 #include "QWave2/WaveformVRuler.h"
@@ -48,10 +49,16 @@ QGridLayout* MEUnity::creatWaveFromPanel(QWave2::SndFile* sndFile,QWidget* paren
     QWave2::WaveformRuler* ruler = new QWave2::WaveformRuler(false, parent);
     QWave2::WaveformCursorProxy* cursor=new QWave2::WaveformCursorProxy(parent);
     QWave2::WaveformSelectionProxy* selection=new QWave2::WaveformSelectionProxy(parent);
+
+    parent->connect(selection, SIGNAL(waveformSelectionChanged(double,double,Waveform*)),
+            parent, SLOT(changeSelection(double,double,Waveform*)));
+    parent->connect(waveForm, SIGNAL(waveformMouseMoved(Waveform*,double)),
+            parent, SLOT(setTime(Waveform*,double)));
     r->connectToWaveform(waveForm);
     ruler->connectToWaveform(waveForm);
     cursor->registerWaveform(waveForm);
     selection->registerWaveform(waveForm);
+
     grid->addWidget(ruler,2,2);
     grid->addWidget(waveformScrollBar,3,2);
     grid->addWidget(waveForm,1,2);
@@ -59,6 +66,7 @@ QGridLayout* MEUnity::creatWaveFromPanel(QWave2::SndFile* sndFile,QWidget* paren
     waveForm->show();
     r->show();
     ruler->show();
+
     return grid;
 }
 
