@@ -300,8 +300,8 @@ void MainWindow::metaStateChanged(Phonon::State newState, Phonon::State /* oldSt
     }
     else {
         musicTable->resizeColumnsToContents();
-        musicTable->setColumnWidth(1, 900);
-         musicTable->setColumnWidth(0, 300);
+        musicTable->setColumnWidth(1, 1000);
+         musicTable->setColumnWidth(0, 200);
          musicTable->setRowHeight(currentRow,200);
     }
 }
