@@ -64,7 +64,7 @@ namespace QWave2 {
     SndFile::drawWaveform(Waveform* wave,
 			  const int& ch,
 			  const double& beg,
-			  const double& dur)
+                          const double& dur)
     {
 	if (wave->getPaintDevice()->height() == 0 ||
 	    wave->getPaintDevice()->width() == 0)
@@ -131,9 +131,7 @@ namespace QWave2 {
                 if(t<data.count())
                 {
                     const short* sdata=data.constData();
-                    qDebug()<<"total:"<<data.count();
                     memcpy(_cache[upage],&sdata[k*samplerate],samplerate);
-                    qDebug()<<"now:"<<(t+=samplerate);
                 }
 
 		_index[k] = upage;
@@ -209,7 +207,6 @@ namespace QWave2 {
                     if (*p < min || *p > max)
 		    {
 			painter.drawLine(x,(int)nearbyint(center-h*y0),x,(int)nearbyint(center-h*(*p)));
-                        x++;
 		    }
 		    min = max = *p;
                     for (; f<ends[k]; ++f, p++) {
@@ -223,8 +220,8 @@ namespace QWave2 {
 	    if (!new_pixel)
 	    {
 		painter.drawLine(x,(int)nearbyint(center-h*min),x,(int)nearbyint(center-h*max));
-                x++;
 	    }
+            qDebug("-----%d",x);
 	}
 	else {
 	    //double x0 = wave->getBeginPixels();
@@ -238,7 +235,6 @@ namespace QWave2 {
 		    x = (int)trunc(x1);
 		    y = center - (int)nearbyint(*p * h);
 		    painter.drawLine(x,y0,x,y);
-                    x++;
 		    qDebug()<<__FILE__<<","<<__LINE__<<x;
 		    painter.drawLine(x,y,(int)trunc(x1+r),y);
 		    qDebug()<<__FILE__<<","<<__LINE__<<x;
@@ -276,6 +272,7 @@ namespace QWave2 {
     double
     SndFile::getLengthSeconds()
     {
+        return this->lengthSeconds;
 	int frames=0;
 	int samplerate=0;
 	return (double)frames/samplerate;

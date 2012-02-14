@@ -207,8 +207,8 @@ void MainWindow::tick(qint64 time)
     QTime displayTime(0, (time / 60000) % 60, (time / 1000) % 60);
 
     timeLcd->display(displayTime.toString("mm:ss"));
-    if(time>this->dur||time<this->beg)
-        this->mediaObject->pause();
+//    if(time>this->dur||time<this->beg)
+//        this->mediaObject->pause();
 }
 //![11]
 
@@ -438,6 +438,7 @@ void MainWindow::setupUi()
 
 void MainWindow::showCurve(int num)
 {
+
     int currentRow=this->justPaintRow;
     currentRow=currentRow<0?0:currentRow;
     QWidget* waveFromWidget=dynamic_cast<QWidget*>(musicTable->cellWidget(currentRow,1));
@@ -445,17 +446,16 @@ void MainWindow::showCurve(int num)
     MEAudioDecoder* decoder=decoders[num];
     QWave2::SndFile* sndFile=new QWave2::SndFile(static_cast<MEAudioDecoder*>(decoder));
     sndFile->data=decoderWatcher->resultAt(num);
+    sndFile->lengthSeconds=mediaObject->totalTime()/1000;
     QWidget *titleWidget =dynamic_cast<QWidget*>(musicTable->cellWidget(currentRow,0));
 //    QVBoxLayout *titleLayout =dynamic_cast<QVBoxLayout*>(titleWidget->layout());
     qDebug()<<"Total time:"<<mediaObject->totalTime();
-    QGridLayout* grid=MEUnity::unity()->creatWaveFromPanel(sndFile,this,mediaObject->totalTime()/1000);
+    QGridLayout* grid=MEUnity::unity()->creatWaveFromPanel(sndFile,waveFromWidget,mediaObject->totalTime()/1000*4,this);
     QVBoxLayout* titleLayout=MEUnity::unity()->creatTitlePanel(decoder);
-
+    titleWidget->setLayout(titleLayout);
+    /*
     if(sndFile->data.count())
     {
-        titleWidget->setLayout(titleLayout);
-
-        waveFromWidget->setLayout(grid);
     }
     else
     {
@@ -469,6 +469,7 @@ void MainWindow::showCurve(int num)
             tr("Fail to open the file"));
     }
     justPaintRow=-1;
+    */
 }
 
 void MainWindow::changeSelection(double beg, double dur, Waveform*)

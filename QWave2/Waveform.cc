@@ -59,13 +59,13 @@ namespace QWave2 {
     double
     Waveform::getBeginFrames() const
     {
-	return _beg * _samplerate;
+        return _beg * this->getFramesPerSecond();
     }
 
     double
     Waveform::getWidthFrames() const
     {
-	return _dur * _samplerate;
+        return this->_sndfile->getFrames();
     }
 
     double
@@ -119,71 +119,83 @@ namespace QWave2 {
     double
     Waveform::getFramesPerPixel() const
     {
+        return this->_sndfile->getFrames()/this->_width;
 	return _spp * _samplerate;
     }
 
     double
     Waveform::getPixelsPerFrame() const
     {
-	return _pps / _samplerate;
+//	return _pps / _samplerate;
+        return _width/this->_sndfile->getFrames();
     }
 
     double
     Waveform::getSecondsPerFrame() const
     {
-	return 1.0 / _samplerate;
+//	return 1.0 / _samplerate;
+        return _dur/this->_sndfile->getFrames();
+
     }
 
     double
     Waveform::getFramesPerSecond() const
     {
-	return (double)_samplerate;
+        return this->_sndfile->getFrames()/_dur;
+//	return (double)_samplerate;
     }
 
     double
     Waveform::px2time(const double& px) const
     {
+        return this->getSecondsPerPixel()*px+_beg;
 	return px * _spp + _beg;
     }
 
     double
     Waveform::time2px(const double& t) const
     {
+        return this->getPixelsPerSecond()*(t-_beg);
 	return _pps * (t - _beg);
     }
 
     double
     Waveform::frm2px(const double& f) const
     {
+        return this->getPixelsPerFrame()*f;
 	return (f / _samplerate - _beg ) * _pps;
     }
 
     double
     Waveform::px2frm(const double& px) const
     {
+        return this->getFramesPerPixel()*px;
 	return (px * _spp + _beg) * _samplerate;
     }
 
     double
     Waveform::frm2time(const double& f) const
     {
+        return this->getSecondsPerFrame()*f;
 	return f / _samplerate;
     }
 
     double
     Waveform::time2frm(const double& t) const
     {
+        return this->getFramesPerSecond()*t;
 	return t * _samplerate;
     }
 
     void
     Waveform::resizeEvent(QResizeEvent* e)
     {
+
 	const QSize& s = e->size();
 
 	_width = s.width() - 1;
 	_height = s.height() - 1;
-
+        qDebug("resize width:%d",_width);
 	_canvas.setSceneRect(0,0,_width,_height);
 	//_waves[_waveidx].resize(s);
 	//_waves[!_waveidx].resize(s);
@@ -195,12 +207,13 @@ namespace QWave2 {
         _pps = (double)_width / _dur;
         _spp = (double)_dur / _width;
 
-	_waves[_waveidx]->fill();
-	_sndfile->drawWaveform(this,_channel,_beg, _dur);
+        _waves[_waveidx]->fill();
+        _sndfile->drawWaveform(this,_channel,_beg, _dur);
 
 	flushWaveform();
 	adjustCanvasItems();
 	emit(waveformWindowResized());
+
     }
 
     void

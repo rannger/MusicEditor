@@ -123,7 +123,7 @@ namespace QWave2 {
                 */
                 virtual char const*
                     getFileName();
-
+                int lengthSeconds;
         protected:
                 /**
                    Creates a dummy SndFile.

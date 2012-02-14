@@ -40,32 +40,45 @@ MEUnity* MEUnity::unity()
     return MEUnity::_unity;
 }
 
-QGridLayout* MEUnity::creatWaveFromPanel(QWave2::SndFile* sndFile,QWidget* parent,double time)
+QGridLayout* MEUnity::creatWaveFromPanel(QWave2::SndFile* sndFile,QWidget* parent,double time,QMainWindow* mainWindow)
 {
     QGridLayout* grid= new QGridLayout();
+    QVBoxLayout* layout=new QVBoxLayout(parent);
     QWave2::Waveform *waveForm=new QWave2::Waveform(sndFile,0,0.0,time,parent);
     QWave2::WaveformVRuler *r = new QWave2::WaveformVRuler(parent);
-    QWave2::WaveformScrollBar* waveformScrollBar = new QWave2::WaveformScrollBar(parent);
+//    QWave2::WaveformScrollBar* waveformScrollBar = new QWave2::WaveformScrollBar(parent);
     QWave2::WaveformRuler* ruler = new QWave2::WaveformRuler(false, parent);
     QWave2::WaveformCursorProxy* cursor=new QWave2::WaveformCursorProxy(parent);
     QWave2::WaveformSelectionProxy* selection=new QWave2::WaveformSelectionProxy(parent);
 
     parent->connect(selection, SIGNAL(waveformSelectionChanged(double,double,Waveform*)),
-            parent, SLOT(changeSelection(double,double,Waveform*)));
-    parent->connect(waveForm, SIGNAL(waveformMouseMoved(Waveform*,double)),
-            parent, SLOT(setTime(Waveform*,double)));
+            mainWindow, SLOT(changeSelection(double,double,Waveform*)));
+
+//    layout->addWidget(waveformScrollBar);
+    grid->setSpacing(1);
+    grid->addWidget((new QWidget(parent)), 0,0);
+    grid->addWidget(ruler,0,1);
+    int gridCurRow = 1;
+    layout->addLayout(grid);
+    grid->addWidget(r, gridCurRow++, 0);
+    grid->addWidget(waveForm, gridCurRow++, 1);
     r->connectToWaveform(waveForm);
-    ruler->connectToWaveform(waveForm);
+    r->show();
+
+    waveForm->show();
+    ruler->show();
+
     cursor->registerWaveform(waveForm);
     selection->registerWaveform(waveForm);
 
-    grid->addWidget(ruler,2,2);
-    grid->addWidget(waveformScrollBar,3,2);
-    grid->addWidget(waveForm,1,2);
-    grid->addWidget(r,1,1);
-    waveForm->show();
-    r->show();
-    ruler->show();
+    parent->connect(waveForm, SIGNAL(waveformMouseMoved(Waveform*,double)),
+            mainWindow, SLOT(setTime(Waveform*,double)));
+//    waveformScrollBar->registerWaveform(waveForm);
+
+    ruler->connectToWaveform(waveForm);
+
+
+
 
     return grid;
 }

@@ -18,7 +18,6 @@
 #include <assert.h>
  QVector<short> AsynchronousDecoder(QString file,MEAudioDecoder *decoder)
 {
-
     do{
          decoder->dealloc();
     }
@@ -26,6 +25,7 @@
     if(decoder->getSuccessFlag()<0)
         return QVector<short>();
     QVector<short> data;
+
     decoder->decoder(data);
 //    plot->update(data);
     qDebug()<<"decode finsih";
@@ -38,7 +38,9 @@ void AsynchronousEncoder(QString file,MEAudioDecoder *decoder,int64_t time)
     MEAuidoEncoder *encoder=new MEAuidoEncoder();
     assert(!(decoder->SeekFrame(time)<0));
     int ret=0;
-    qDebug()<<(ret=encoder->OpenFile(file,decoder->getSampleRate(),decoder->getChannels(),decoder));
+    do{
+        qDebug()<<(ret=encoder->OpenFile(file,decoder->getSampleRate(),decoder->getChannels(),decoder));
+    }while(ret!=0);
     if(ret!=0)
         goto END;
     encoder->encoder(decoder);
