@@ -46,11 +46,14 @@ int MEAudioDecoder::init()
     infmt_ctx=NULL;
     successFlag=-1;
     numberOfFrames=0;
+    frameToRead=-1;
+    frameCount=0;
     return 0;
 }
 
 int MEAudioDecoder::getNumberOfFrame()
 {
+
     int retval=0;
 
     retval=incode_ctx->frame_number/*infmt_ctx->streams[this->audioindex]->nb_frames*/;
@@ -316,7 +319,21 @@ int MEAudioDecoder::getChannels()
 
 int MEAudioDecoder::readFrame(AVPacket &packet)
 {
-    return av_read_frame(infmt_ctx,&packet);
+
+    if(frameToRead<0)
+        return av_read_frame(infmt_ctx,&packet);
+    if(frameCount<frameToRead)
+    {
+        frameCount++;
+        return av_read_frame(infmt_ctx,&packet);
+    }
+    else
+    {
+        frameToRead=-1;
+        frameCount=0;
+        return frameToRead;
+    }
+    return -1;
 }
 
 QString MEAudioDecoder::getFileName()
@@ -325,3 +342,13 @@ QString MEAudioDecoder::getFileName()
     return retval;
 }
 
+void MEAudioDecoder::setFrameToRead(int frame)
+{
+    frameToRead=frame;
+    frameCount=0;
+}
+
+int MEAudioDecoder::getFrameToRead()
+{
+    return this->frameToRead;
+}

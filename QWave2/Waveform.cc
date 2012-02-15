@@ -183,7 +183,7 @@ namespace QWave2 {
     double
     Waveform::time2frm(const double& t) const
     {
-        return this->getFramesPerSecond()*t;
+        return getFramesPerSecond()*t;
 	return t * _samplerate;
     }
 

@@ -19,6 +19,7 @@
 #include "meaudiodecoder.h"
 #include "meauidoencoder.h"
 #include "asynchronous_decode.h"
+#include <stdio.h>
 #include <assert.h>
 #include "QWave2/Waveform.h"
 #include "QWave2/WaveformVRuler.h"
@@ -131,20 +132,22 @@ void MainWindow::translateMusicFormat()
                                                 "Music (*.mp3 *.wav *.wma)");
 
 
-    int64_t seekTime=mediaObject->currentTime();
+    int64_t seekTime=(int)beg;
 
     if(file.length())
     {
-        if(!QFile::exists(file))
-        {
-            QFile musicFile(file);
-            musicFile.open(QIODevice::Truncate);
-            char a='\0';
-            musicFile.write(&a);
-            musicFile.close();
+
+        QFileInfo finfo(file);
+        if (!finfo.exists()) {
+
+            FILE* fp=fopen(file.toLocal8Bit().data(),"wb");
+            char b='a';
+            fwrite(&b,sizeof(b),1,fp);
+            fclose(fp);
         }
         MEAudioDecoder* decoder=decoders[musicTable->currentRow()<0?0:musicTable->currentRow()];
-        encoderWatcher->setFuture(QtConcurrent::run(AsynchronousEncoder,file,decoder,seekTime));
+        Waveform* form=waveForms[metaInformationResolver->currentSource().fileName()];
+        encoderWatcher->setFuture(QtConcurrent::run(AsynchronousEncoder,file,decoder,seekTime,form->time2frm((dur-beg)*0.001*5)*0.001));
     }
 
 

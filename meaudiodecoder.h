@@ -42,6 +42,8 @@ public:
     int SeekFrame(int64_t num=0);
     int getSuccessFlag();
     int decoder(QVector< short >& retData);
+    void setFrameToRead(int frame);
+    int getFrameToRead();
 private:
     char fileName[FILENAME_MAX];
     AVFormatContext *infmt_ctx;
@@ -50,6 +52,8 @@ private:
     int audioindex;
     int successFlag;
     int numberOfFrames;
+    int frameToRead;
+    int frameCount;
 };
 
 #endif // MEAUDIODECODER_H

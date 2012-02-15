@@ -32,9 +32,10 @@
     return data;
 }
 
-void AsynchronousEncoder(QString file,MEAudioDecoder *decoder,int64_t time)
+void AsynchronousEncoder(QString file,MEAudioDecoder *decoder,int64_t time,int frames)
 {
     assert(decoder);
+    decoder->setFrameToRead(frames);
     MEAuidoEncoder *encoder=new MEAuidoEncoder();
     assert(!(decoder->SeekFrame(time)<0));
     int ret=0;
