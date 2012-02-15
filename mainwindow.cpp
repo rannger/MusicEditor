@@ -31,7 +31,7 @@
 #include <QWave2/TimeLabel.h>
 #include "meunity.h"
 
-
+using namespace QWave2;
 
 QFutureWatcher< QVector<short> > *MainWindow::decoderWatcher=NULL;
 QFutureWatcher<void> *MainWindow::encoderWatcher=NULL;
@@ -89,6 +89,11 @@ MainWindow::~MainWindow()
     }
 
 
+}
+
+QMap<QString,QWave2::Waveform*> *MainWindow::getWaveForm()
+{
+    return &waveForms;
 }
 
 //![6]
@@ -161,6 +166,7 @@ void MainWindow::stateChanged(Phonon::State newState, Phonon::State /* oldState 
 //![9]
 //![10]
         case Phonon::PlayingState:
+                mediaObject->seek((int)beg);
                 playAction->setEnabled(false);
                 pauseAction->setEnabled(true);
                 stopAction->setEnabled(true);
@@ -207,8 +213,11 @@ void MainWindow::tick(qint64 time)
     QTime displayTime(0, (time / 60000) % 60, (time / 1000) % 60);
 
     timeLcd->display(displayTime.toString("mm:ss"));
-//    if(time>this->dur||time<this->beg)
-//        this->mediaObject->pause();
+    if(time>(int)dur||time<(int)beg)
+        this->mediaObject->pause();
+    QString str=metaInformationResolver->currentSource().fileName();
+    emit(updateCursorPosition(waveForms[str],(int)time/1000*4));
+
 }
 //![11]
 
@@ -472,16 +481,15 @@ void MainWindow::showCurve(int num)
     */
 }
 
-void MainWindow::changeSelection(double beg, double dur, Waveform*)
+void MainWindow::changeSelection(double aBeg, double aDur, QWave2::Waveform*)
 {
-    this->beg=beg*1000;
-    this->dur=dur*1000+this->beg;
-    mediaObject->seek((qint64)beg*1000);
-    mediaObject->play();
+    this->beg=aBeg/4*1000;
+    this->dur=(aDur/4*1000+beg);
+    this->mediaObject->pause();
 }
 
 void
-MainWindow::setTime(Waveform*,double t)
+MainWindow::setTime(QWave2::Waveform*,double t)
 {
 
 }

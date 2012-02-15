@@ -14,8 +14,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 **************************************************************************/
 
-#include "meunity.h"
-#include "mainwindow.h"
+
 #include <QtGui>
 #include "QWave2/Waveform.h"
 #include "QWave2/WaveformVRuler.h"
@@ -27,6 +26,9 @@
 #include <QWave2/WaveformSelectionProxy.h>
 #include <QWave2/TimeLabel.h>
 #include <meaudiodecoder.h>
+#include "mainwindow.h"
+#include "meunity.h"
+using namespace QWave2;
 MEUnity* MEUnity::_unity=NULL;
 
 MEUnity::MEUnity()
@@ -40,13 +42,15 @@ MEUnity* MEUnity::unity()
     return MEUnity::_unity;
 }
 
-QGridLayout* MEUnity::creatWaveFromPanel(QWave2::SndFile* sndFile,QWidget* parent,double time,QMainWindow* mainWindow)
+QGridLayout* MEUnity::creatWaveFromPanel(QWave2::SndFile* sndFile,QWidget* parent,double time,MainWindow* mainWindow)
 {
     QGridLayout* grid= new QGridLayout();
     QVBoxLayout* layout=new QVBoxLayout(parent);
     QWave2::Waveform *waveForm=new QWave2::Waveform(sndFile,0,0.0,time,parent);
     QWave2::WaveformVRuler *r = new QWave2::WaveformVRuler(parent);
 //    QWave2::WaveformScrollBar* waveformScrollBar = new QWave2::WaveformScrollBar(parent);
+    QMap<QString,QWave2::Waveform*> &waveForms=*(mainWindow->getWaveForm());
+    waveForms[sndFile->getDecoder()->getFileName()]=waveForm;
     QWave2::WaveformRuler* ruler = new QWave2::WaveformRuler(false, parent);
     QWave2::WaveformCursorProxy* cursor=new QWave2::WaveformCursorProxy(parent);
     QWave2::WaveformSelectionProxy* selection=new QWave2::WaveformSelectionProxy(parent);
@@ -78,7 +82,7 @@ QGridLayout* MEUnity::creatWaveFromPanel(QWave2::SndFile* sndFile,QWidget* paren
     ruler->connectToWaveform(waveForm);
 
 
-
+    parent->connect(mainWindow,SIGNAL(updateCursorPosition(Waveform*,double)),cursor,SLOT(updateCursorPosition(Waveform*,double)));
 
     return grid;
 }

@@ -20,12 +20,12 @@
 class QGridLayout;
 class QVBoxLayout;
 class MEAudioDecoder;
-class QMainWindow;
+class MainWindow;
 class MEUnity
 {
 public:
     static MEUnity* unity();
-    QGridLayout* creatWaveFromPanel(QWave2::SndFile* sndFile,QWidget* parent,double time,QMainWindow* mainWindow);
+    QGridLayout* creatWaveFromPanel(QWave2::SndFile* sndFile,QWidget* parent,double time,MainWindow* mainWindow);
     QVBoxLayout* creatTitlePanel(MEAudioDecoder* decoder);
 private:
     static MEUnity* _unity;

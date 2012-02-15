@@ -71,6 +71,7 @@ namespace QWave2 {
                 */
                 SndFile(char const * filename, int cacheSize=MAXCACHEPAGES);
                 SndFile(MEAudioDecoder* aDecoder,int numCPages=MAXCACHEPAGES);
+                MEAudioDecoder* getDecoder(){return decoder;};
                 virtual ~SndFile();
                 QVector< short > data;
                 /**
@@ -121,6 +122,7 @@ namespace QWave2 {
                    @return The sound file name.  This is the same string as the one that
                    is given as the filename parameter of the constructor.
                 */
+
                 virtual char const*
                     getFileName();
                 int lengthSeconds;

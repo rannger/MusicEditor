@@ -24,16 +24,17 @@
 #include <phonon/backendcapabilities.h>
 #include <QList>
 #include <QtGui>
+#include "QWave2/Waveform.h"
 QT_BEGIN_NAMESPACE
 class QAction;
 class QTableWidget;
 class QLCDNumber;
 QT_END_NAMESPACE
-
+using namespace QWave2;
 //![0]
 class Plot;
 class MEAudioDecoder;
-class Waveform;
+
 class MainWindow : public QMainWindow
 {
 //![0]
@@ -45,6 +46,9 @@ public:
     QSize sizeHint() const {
         return QSize(500, 300);
     }
+    QMap<QString,QWave2::Waveform*> *getWaveForm();
+signals:
+    void updateCursorPosition(Waveform* wave, double beg);
 public slots:
     void showCurve(int num);
 
@@ -92,9 +96,10 @@ private:
 //    MEAudioDecoder *decoder;
     int previousRow;
     int justPaintRow;
-    qint64 dur;
-    qint64 beg;
+    double dur;
+    double beg;
     QMap<int,MEAudioDecoder*> decoders;
+    QMap<QString,Waveform*> waveForms;
 public:
     static QFutureWatcher< QVector< short > > *decoderWatcher;
     static QFutureWatcher<void> *encoderWatcher;

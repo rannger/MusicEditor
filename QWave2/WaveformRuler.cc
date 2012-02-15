@@ -143,15 +143,15 @@ namespace QWave2 {
 
         _pm->fill(palette().color(QPalette::Background));
         // we need at least 50 pixels beteen major ticks
-        double spp = _wave->getSecondsPerPixel();
-        double pps = _wave->getPixelsPerSecond();
+        double spp = _wave->getSecondsPerPixel()/4;
+        double pps = _wave->getPixelsPerSecond()*4;
         map<double,int>::iterator unit = _units.upper_bound(50 * spp);
         if (unit == _units.end()) return;
         double major = unit->first;
         double minor = major / unit->second;
         double t0 = _wave->getBeginSeconds();
         double beg = floor(t0 / major) * major;
-        double end = beg + _wave->getWidthSeconds() + major;
+        double end = beg + _wave->getWidthSeconds()/4 + major;
 
         int exp = ilog10(major);
         if (exp < 1) exp = 1;

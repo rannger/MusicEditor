@@ -326,7 +326,7 @@ namespace QWave2 {
 	adjustCanvasItems();
 	//int id = rand();
 	//qDebug() << "emit " << id << " " << _beg << " " << _dur;
-	emit(waveformHorizontallyChanged(_beg,_dur));
+        emit(waveformHorizontallyChanged(_beg,_dur/4));
 	//qDebug() << "emit done " << id;
 	_display_mutex.unlock();
     }
