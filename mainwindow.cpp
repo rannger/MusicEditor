@@ -455,9 +455,10 @@ void MainWindow::showCurve(int num)
     currentRow=currentRow<0?0:currentRow;
     QWidget* waveFromWidget=dynamic_cast<QWidget*>(musicTable->cellWidget(currentRow,1));
 
-    MEAudioDecoder* decoder=decoders[num];
+    MEAudioDecoder* decoder=decoders[currentRow];
     QWave2::SndFile* sndFile=new QWave2::SndFile(static_cast<MEAudioDecoder*>(decoder));
     sndFile->data=decoderWatcher->resultAt(num);
+    qDebug(">>>>>>>>>>>>>>>>>>>%p",&(sndFile->data));
     sndFile->lengthSeconds=mediaObject->totalTime()/1000;
     QWidget *titleWidget =dynamic_cast<QWidget*>(musicTable->cellWidget(currentRow,0));
 //    QVBoxLayout *titleLayout =dynamic_cast<QVBoxLayout*>(titleWidget->layout());

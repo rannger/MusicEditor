@@ -25,7 +25,6 @@
     if(decoder->getSuccessFlag()<0)
         return QVector<short>();
     QVector<short> data;
-
     decoder->decoder(data);
 //    plot->update(data);
     qDebug()<<"decode finsih";
