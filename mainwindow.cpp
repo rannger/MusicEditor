@@ -17,7 +17,6 @@
 #include "ffmpeg.h"
 #include "mainwindow.h"
 #include "meaudiodecoder.h"
-#include "meauidoencoder.h"
 #include "asynchronous_decode.h"
 #include <stdio.h>
 #include <assert.h>

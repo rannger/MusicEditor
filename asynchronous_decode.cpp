@@ -16,6 +16,7 @@
 
 #include "asynchronous_decode.h"
 #include <assert.h>
+#include "ffmpeg.h"
  QVector<short> AsynchronousDecoder(QString file,MEAudioDecoder *decoder)
 {
     do{
@@ -33,19 +34,6 @@
 
 void AsynchronousEncoder(QString file,MEAudioDecoder *decoder,int64_t time,int frames)
 {
-    assert(decoder);
-    decoder->setFrameToRead(frames);
-    MEAuidoEncoder *encoder=new MEAuidoEncoder();
-    assert(!(decoder->SeekFrame(time)<0));
-    int ret=0;
-    do{
-        qDebug()<<(ret=encoder->OpenFile(file,decoder->getSampleRate(),decoder->getChannels(),decoder));
-    }while(ret!=0);
-    if(ret!=0)
-        goto END;
-    encoder->encoder(decoder);
+    ffmpeg_conver_audio(decoder->getFileName().toLocal8Bit().data(),file.toLocal8Bit().data(),decoder->getSampleRate(),decoder->getChannels(),time,frames);
     qDebug()<<"encode finish";
-END:
-    encoder->release();
-    ;
 }

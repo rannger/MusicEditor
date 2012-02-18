@@ -60,7 +60,7 @@ extern "C" {
 }
 #include "debug_string.h"
 int ffmpeg_conver_audio(const char* input_file, const char* output_file, int samples_rate, int channel);
-
+int ffmpeg_conver_audio(const char* input_file, const char* output_file, int samples_rate, int channel,int seekFrame,const int encodeFrame);
 
 
 #endif // _FFMPEG_H

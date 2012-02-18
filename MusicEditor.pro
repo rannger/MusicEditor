@@ -18,7 +18,6 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     ffmpeg.cpp \
     meaudiodecoder.cpp \
-    meauidoencoder.cpp \
     asynchronous_decode.cpp \
     QWave2/WaveformVRuler.cc \
     QWave2/WaveformSelectionProxy.cc \
@@ -40,7 +39,6 @@ SOURCES += main.cpp\
 HEADERS  += \
     mainwindow.h \
     meaudiodecoder.h \
-    meauidoencoder.h \
     debug_string.h \
     ffmpeg.h \
     AudioData.h \

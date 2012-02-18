@@ -17,7 +17,6 @@
 #ifndef ASYNCHRONOUS_DECODE_H
 #define ASYNCHRONOUS_DECODE_H
 #include "meaudiodecoder.h"
-#include "meauidoencoder.h"
 
 #include <QtCore>
 #include <QDebug>

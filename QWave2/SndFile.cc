@@ -4,7 +4,6 @@
 #include <limits.h>
 #include <cmath>
 #include "meaudiodecoder.h"
-#include "meauidoencoder.h"
 
 namespace QWave2 {
 
