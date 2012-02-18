@@ -42,7 +42,7 @@ MainWindow::MainWindow()
     mediaObject = new Phonon::MediaObject(this);
     metaInformationResolver = new Phonon::MediaObject(this);
 
-    mediaObject->setTickInterval(1000);
+    mediaObject->setTickInterval(10);
 //![0]
 //![2]
     connect(mediaObject, SIGNAL(tick(qint64)), this, SLOT(tick(qint64)));
@@ -454,7 +454,7 @@ void MainWindow::showCurve(int num)
     currentRow=currentRow<0?0:currentRow;
     QWidget* waveFromWidget=dynamic_cast<QWidget*>(musicTable->cellWidget(currentRow,1));
 
-    MEAudioDecoder* decoder=decoders[currentRow];
+    MEAudioDecoder* decoder=decoders[justPaintRow];
     QWave2::SndFile* sndFile=new QWave2::SndFile(static_cast<MEAudioDecoder*>(decoder));
     sndFile->data=decoderWatcher->resultAt(num);
     qDebug(">>>>>>>>>>>>>>>>>>>%p",&(sndFile->data));
@@ -465,6 +465,7 @@ void MainWindow::showCurve(int num)
     QGridLayout* grid=MEUnity::unity()->creatWaveFromPanel(sndFile,waveFromWidget,mediaObject->totalTime()/1000*4,this);
     QVBoxLayout* titleLayout=MEUnity::unity()->creatTitlePanel(decoder);
     titleWidget->setLayout(titleLayout);
+
     /*
     if(sndFile->data.count())
     {
