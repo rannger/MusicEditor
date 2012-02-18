@@ -42,7 +42,7 @@ MainWindow::MainWindow()
     mediaObject = new Phonon::MediaObject(this);
     metaInformationResolver = new Phonon::MediaObject(this);
 
-    mediaObject->setTickInterval(10);
+    mediaObject->setTickInterval(1);
 //![0]
 //![2]
     connect(mediaObject, SIGNAL(tick(qint64)), this, SLOT(tick(qint64)));
@@ -213,12 +213,12 @@ void MainWindow::stateChanged(Phonon::State newState, Phonon::State /* oldState 
 void MainWindow::tick(qint64 time)
 {
     QTime displayTime(0, (time / 60000) % 60, (time / 1000) % 60);
-
     timeLcd->display(displayTime.toString("mm:ss"));
     if(time>(int)dur||time<(int)beg)
         this->mediaObject->pause();
     QString str=metaInformationResolver->currentSource().fileName();
-    emit(updateCursorPosition(waveForms[str],(int)time/1000*4));
+    double times=((int)time);
+    emit(updateCursorPosition(waveForms[str],times/1000*4));
 
 }
 //![11]
