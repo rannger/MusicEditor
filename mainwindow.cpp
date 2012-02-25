@@ -42,7 +42,7 @@ MainWindow::MainWindow()
     mediaObject = new Phonon::MediaObject(this);
     metaInformationResolver = new Phonon::MediaObject(this);
 
-    mediaObject->setTickInterval(1);
+    mediaObject->setTickInterval(1000);
 //![0]
 //![2]
     connect(mediaObject, SIGNAL(tick(qint64)), this, SLOT(tick(qint64)));
