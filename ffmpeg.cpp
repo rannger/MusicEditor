@@ -375,7 +375,7 @@ int ffmpeg_conver_audio(const char* input_file, const char* output_file, int sam
 
 
 
-int ffmpeg_conver_audio(const char* input_file, const char* output_file, int samples_rate, int channel,int seekFrame,const int encodeFrame)
+int ffmpeg_conver_audio(const char* input_file, const char* output_file, int samples_rate, int channel,int seekFrame,const int encodeFrame,const int outputSeekFrame)
 {
         AVFormatContext *infmt_ctx=NULL;
 
@@ -589,8 +589,18 @@ int ffmpeg_conver_audio(const char* input_file, const char* output_file, int sam
                 }
         }
 
-        /* 写输出文件的头 */
-        av_write_header(outfmt_ctx);
+        if(outputSeekFrame==-1)
+        {
+            /* 写输出文件的头 */
+            av_write_header(outfmt_ctx);
+        }
+        else
+        {
+            double timestamp=(double)outputSeekFrame;
+            timestamp/=1000;
+            av_seek_frame(outfmt_ctx,-1,int64_t(timestamp*AV_TIME_BASE),AVSEEK_FLAG_ANY);
+        }
+
 
 
 #ifdef WIN32
@@ -718,7 +728,11 @@ int ffmpeg_conver_audio(const char* input_file, const char* output_file, int sam
         }
 
         /* write the trailer, if any */
-        av_write_trailer(outfmt_ctx);
+        if(outputSeekFrame==-1)
+        {
+             av_write_trailer(outfmt_ctx);
+        }
+
 
         avcodec_close(outcode_ctx);
 

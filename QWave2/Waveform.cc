@@ -36,6 +36,7 @@ namespace QWave2 {
 	//viewport()->setMouseTracking(true);
 	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        setCacheMode(QGraphicsView::CacheNone);
     }
 
     Waveform::~Waveform()

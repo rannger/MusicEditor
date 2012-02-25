@@ -163,7 +163,7 @@ namespace QWave2 {
 
 //  qDebug("%f", r);
 	if (r<1.0) {
-	    int x;
+            int x;
 	    if (s != s1)
 		x = (int)nearbyint((s1 / samplerate - t0) * pps);
 	    else
@@ -240,7 +240,7 @@ namespace QWave2 {
 		    y0 = y;
 		}
 	    }
-	}
+        }
 
     }
 
