@@ -375,7 +375,13 @@ int ffmpeg_conver_audio(const char* input_file, const char* output_file, int sam
 
 
 
-int ffmpeg_conver_audio(const char* input_file, const char* output_file, int samples_rate, int channel,int seekFrame,const int encodeFrame,const int outputSeekFrame)
+int ffmpeg_conver_audio(const char* input_file,
+                        const char* output_file,
+                        int samples_rate,
+                        int channel,
+                        int seekFrame,
+                        const int encodeFrame,
+                        const int outputSeekFrame)
 {
         AVFormatContext *infmt_ctx=NULL;
 
