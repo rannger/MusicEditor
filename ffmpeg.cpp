@@ -752,7 +752,8 @@ int ffmpeg_conver_audio(const char* input_file1,
                         int samples_rate,
                         int channel,
                         int seekFrame,
-                        const int encodeFrame)
+                        const int encodeFrame1,
+                        const int encodeFrame2)
 {
         AVFormatContext *infmt_ctx=NULL;
 
@@ -847,11 +848,11 @@ int ffmpeg_conver_audio(const char* input_file1,
 
         // 查找音频流信息
         int audioindex2=-1;
-        for(unsigned int j = 0; j < infmt_ctx->nb_streams; j++)
+        for(unsigned int j = 0; j < infmt_ctx2->nb_streams; j++)
         {
-                if(infmt_ctx->streams[j]->codec->codec_type == CODEC_TYPE_AUDIO)
+                if(infmt_ctx2->streams[j]->codec->codec_type == CODEC_TYPE_AUDIO)
                 {
-                        audioindex=j;
+                        audioindex2=j;
                         break;
                 }
         }
@@ -865,11 +866,11 @@ int ffmpeg_conver_audio(const char* input_file1,
         AVCodecContext *incode_ctx2;
         AVCodec *incodec2;
 
-        incode_ctx2 = infmt_ctx2->streams[audioindex]->codec;
+        incode_ctx2 = infmt_ctx2->streams[audioindex2]->codec;
 
         //找到合适的音频解码器
         incodec2 = avcodec_find_decoder(incode_ctx2->codec_id);
-        if(incodec == NULL)
+        if(incodec2 == NULL)
         {
                 debug_string("can't find suitable audio decoder\n");
                 return -4;
@@ -1056,11 +1057,11 @@ int ffmpeg_conver_audio(const char* input_file1,
         qDebug("%s,%d",__FILE__,__LINE__);
         while(av_read_frame(infmt_ctx, &packet) >= 0)//从输入文件中读取一个包
         {
-/*
+
                 if(frameCount>=encodeFrame1)
                     break;
                 frameCount++;
-*/
+
                 if(packet.stream_index == audioindex)
                 {
                         pktsize = packet.size;
@@ -1163,10 +1164,10 @@ int ffmpeg_conver_audio(const char* input_file1,
         frameCount=0;
         while(av_read_frame(infmt_ctx2, &packet) >= 0)//从输入文件中读取一个包
         {
-                if(frameCount>=encodeFrame)
+                if(frameCount>=encodeFrame2)
                     break;
                 frameCount++;
-                if(packet.stream_index == audioindex)
+                if(packet.stream_index == audioindex2)
                 {
                         pktsize = packet.size;
                         pktdata = packet.data;
@@ -1267,11 +1268,11 @@ int ffmpeg_conver_audio(const char* input_file1,
 
         while(av_read_frame(infmt_ctx, &packet) >= 0)//从输入文件中读取一个包
         {
-        /*
-                if(frameCount>=encodeFrame2)
-                    break;
-                frameCount++;
-        */
+
+//                if(frameCount>=encodeFrame1)
+//                    break;
+//                frameCount++;
+
                 if(packet.stream_index == audioindex)
                 {
                         pktsize = packet.size;
@@ -1282,7 +1283,7 @@ int ffmpeg_conver_audio(const char* input_file1,
                                 //if(&packet)
                                 //samples=(short *)av_fast_realloc(samples,&samples_size,FFMAX(packet.size*sizeof(*samples),AVCODEC_MAX_AUDIO_FRAME_SIZE));
                                 samples_size_ptr = AVCODEC_MAX_AUDIO_FRAME_SIZE;
-                                len = avcodec_decode_audio2(incode_ctx2, samples, &samples_size_ptr, pktdata, pktsize);//若为音频包，解码该音频包
+                                len = avcodec_decode_audio2(incode_ctx, samples, &samples_size_ptr, pktdata, pktsize);//若为音频包，解码该音频包
 //                                printf("source frame number：%d\n", incode_ctx->frame_number);
                                 if(len <0)
                                 {
@@ -1370,7 +1371,6 @@ int ffmpeg_conver_audio(const char* input_file1,
                 // Free the packet that was allocated by av_read_frame
                 av_free_packet(&packet);
         }
-
 
         /* write the trailer, if any */
         av_write_trailer(outfmt_ctx);

@@ -66,6 +66,14 @@ int ffmpeg_conver_audio(const char* input_file,
                         int channel,
                         int seekFrame,
                         const int encodeFrame);
+int ffmpeg_conver_audio(const char* input_file1,
+                        const char* input_file2,
+                        const char* output_file,
+                        int samples_rate,
+                        int channel,
+                        int seekFrame,
+                        const int encodeFrame1,
+                        const int encodeFrame2);
 
 
 #endif // _FFMPEG_H
