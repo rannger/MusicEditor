@@ -34,14 +34,14 @@
 
 void AsynchronousEncoder(QString file,MEAudioDecoder *decoder,int64_t time,int frames)
 {
-//    ffmpeg_conver_audio(decoder->getFileName().toLocal8Bit().data(),file.toLocal8Bit().data(),decoder->getSampleRate(),decoder->getChannels(),time,frames);
-    ffmpeg_conver_audio(decoder->getFileName().toLocal8Bit().data(),
+      ffmpeg_conver_audio(decoder->getFileName().toLocal8Bit().data(),file.toLocal8Bit().data(),decoder->getSampleRate(),decoder->getChannels(),time,frames);
+/*    ffmpeg_conver_audio(decoder->getFileName().toLocal8Bit().data(),
                         "/mnt/f/mp3/FateZero/fate-zero-ed-tv-size.Wav",
                         file.toLocal8Bit().data(),
                         decoder->getSampleRate(),
                         decoder->getChannels(),
                         time,
                         frames,
-                        frames);
+                        frames)*/;
     qDebug()<<"encode finish";
 }
