@@ -56,6 +56,7 @@ private slots:
     void addFiles();
     void about();
     void translateMusicFormat();
+    void insertMusic();
     void changeSelection(double beg, double dur, Waveform*);
     void setTime(Waveform*,double t);
 //![1]
@@ -91,6 +92,7 @@ private:
     QAction *exitAction;
     QAction *aboutAction;
     QAction *aboutQtAction;
+    QAction *insertMusicAction;
     QLCDNumber *timeLcd;
     QTableWidget *musicTable;
 //    MEAudioDecoder *decoder;

@@ -296,7 +296,7 @@ void MainWindow::metaStateChanged(Phonon::State newState, Phonon::State /* oldSt
     decoderWatcher->setFuture(QtConcurrent::run(AsynchronousDecoder,file,decoder));
     QWidget *waveFormWidget=new QWidget(musicTable);
     waveFormWidget->resize(1000,300);
-//    Plot* plot=new Plot(musicTable);
+
     musicTable->setCellWidget(currentRow,1,waveFormWidget);
 
     if (musicTable->selectedItems().isEmpty()) {
@@ -354,6 +354,7 @@ void MainWindow::setupActions()
     aboutQtAction = new QAction(tr("About &Qt"), this);
     aboutQtAction->setShortcut(tr("Ctrl+Q"));
     translateAction = new QAction(style()->standardIcon(QStyle::SP_DirClosedIcon),tr("&Export File"),this);
+    insertMusicAction = new QAction(style()->standardIcon(QStyle::SP_DirClosedIcon),tr("&Insert Music"),this);
 
 //![5]
     connect(playAction, SIGNAL(triggered()), mediaObject, SLOT(play()));
@@ -365,6 +366,7 @@ void MainWindow::setupActions()
     connect(aboutAction, SIGNAL(triggered()), this, SLOT(about()));
     connect(aboutQtAction, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
     connect(translateAction, SIGNAL(triggered()), this, SLOT(translateMusicFormat()));
+    connect(insertMusicAction, SIGNAL(triggered()), this, SLOT(insertMusic()));
 }
 
 void MainWindow::setupMenus()
@@ -375,6 +377,8 @@ void MainWindow::setupMenus()
     fileMenu->addAction(translateAction);
     fileMenu->addSeparator();
     fileMenu->addAction(exitAction);
+    QMenu* insertMenu=menuBar()->addMenu(tr("&Insert"));
+    insertMenu->addAction(insertMusicAction);
 
     QMenu *aboutMenu = menuBar()->addMenu(tr("&Help"));
     aboutMenu->addAction(aboutAction);
@@ -457,7 +461,7 @@ void MainWindow::showCurve(int num)
     MEAudioDecoder* decoder=decoders[justPaintRow];
     QWave2::SndFile* sndFile=new QWave2::SndFile(static_cast<MEAudioDecoder*>(decoder));
     sndFile->data=decoderWatcher->resultAt(num);
-    qDebug(">>>>>>>>>>>>>>>>>>>%p",&(sndFile->data));
+
     sndFile->lengthSeconds=mediaObject->totalTime()/1000;
     QWidget *titleWidget =dynamic_cast<QWidget*>(musicTable->cellWidget(currentRow,0));
 //    QVBoxLayout *titleLayout =dynamic_cast<QVBoxLayout*>(titleWidget->layout());
@@ -498,3 +502,7 @@ MainWindow::setTime(QWave2::Waveform*,double t)
 
 }
 
+void MainWindow::insertMusic()
+{
+
+}
