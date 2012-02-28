@@ -23,5 +23,11 @@
 
 extern  QVector<short> AsynchronousDecoder(QString file,MEAudioDecoder *decoder);
 extern void AsynchronousEncoder(QString file,MEAudioDecoder *decoder,int64_t time,int frames);
+void AsychronousInsertMusic(QString file,
+                            MEAudioDecoder *decoder1,
+                            MEAudioDecoder *decoder2,
+                            int64_t time,
+                            double encodeFrame1,
+                            double encoderFrame2);
 
 #endif // ASYNCHRONOUS_DECODE_H

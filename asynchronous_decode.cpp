@@ -45,3 +45,20 @@ void AsynchronousEncoder(QString file,MEAudioDecoder *decoder,int64_t time,int f
                         frames)*/;
     qDebug()<<"encode finish";
 }
+
+void AsychronousInsertMusic(QString file,
+                            MEAudioDecoder *decoder1,
+                            MEAudioDecoder *decoder2,
+                            int64_t time,
+                            double encodeFrame1,
+                            double encoderFrame2)
+{
+        ffmpeg_conver_audio(decoder1->getFileName().toLocal8Bit().data(),
+                            decoder2->getFileName().toLocal8Bit().data(),
+                            file.toLocal8Bit().data(),
+                            decoder1->getSampleRate(),
+                            decoder1->getChannels(),
+                            time,
+                            encodeFrame1,
+                            encoderFrame2);
+}

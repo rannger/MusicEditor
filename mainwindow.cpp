@@ -100,7 +100,7 @@ QMap<QString,QWave2::Waveform*> *MainWindow::getWaveForm()
 void MainWindow::addFiles()
 {
     QStringList files = QFileDialog::getOpenFileNames(this, tr("Select Music Files"),
-        QDesktopServices::storageLocation(QDesktopServices::MusicLocation));
+        QDesktopServices::storageLocation(QDesktopServices::MusicLocation),"Music (*.mp3 *.wav *.wma)");
 
     if (files.isEmpty())
         return;
@@ -241,7 +241,7 @@ void MainWindow::tableClicked(int row, int /* column */)
 
     mediaObject->setCurrentSource(sources[row]);
 
-    MEAudioDecoder* decoder=decoders[row];
+//    MEAudioDecoder* decoder=decoders[row];
 //    decoder->dealloc();
 //    decoder->OpenFile(sources[row].fileName());
 
@@ -421,7 +421,7 @@ void MainWindow::setupUi()
     musicTable = new QTableWidget(0, 2);
     musicTable->setHorizontalHeaderLabels(headers);
     musicTable->setSelectionMode(QAbstractItemView::SingleSelection);
-    musicTable->setSelectionBehavior(QAbstractItemView::SelectItems);
+    musicTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     musicTable->setEditTriggers ( QAbstractItemView::NoEditTriggers );
     connect(musicTable, SIGNAL(cellPressed(int,int)),
             this, SLOT(tableClicked(int,int)));
@@ -491,9 +491,9 @@ void MainWindow::showCurve(int num)
 
 void MainWindow::changeSelection(double aBeg, double aDur, QWave2::Waveform*)
 {
-    this->beg=aBeg/4*1000;
-    this->dur=(aDur/4*1000+beg);
-    this->mediaObject->pause();
+    beg=aBeg/4*1000;
+    dur=(aDur/4*1000+beg);
+    mediaObject->pause();
 }
 
 void
@@ -504,5 +504,44 @@ MainWindow::setTime(QWave2::Waveform*,double t)
 
 void MainWindow::insertMusic()
 {
+    MEAudioDecoder* decoder[2]={NULL,NULL};
 
+    if(this->decoders.count()<2)
+        return;
+
+    QString file = QFileDialog::getSaveFileName(this,tr("save file"),QDesktopServices::storageLocation(QDesktopServices::MusicLocation),
+                                                "Music (*.mp3 *.wav *.wma)");
+
+
+    int64_t seekTime=(int)beg;
+
+    if(file.length())
+    {
+
+        QFileInfo finfo(file);
+        if (!finfo.exists()) {
+
+            FILE* fp=fopen(file.toLocal8Bit().data(),"wb");
+            char b='a';
+            fwrite(&b,sizeof(b),1,fp);
+            fclose(fp);
+        }
+        decoder[0]=decoders[previousRow];
+        decoder[1]=decoders[justPaintRow];
+        Waveform* form=waveForms[decoder[1]->getFileName().toLocal8Bit().data()];
+        Waveform* wform=waveForms[decoder[0]->getFileName().toLocal8Bit().data()];
+//        QtConcurrent::run(AsychronousInsertMusic,
+//                                                    file,
+//                                                    decoders[previousRow],
+//                                                    decoders[justPaintRow],
+//                                                    seekTime,
+//                                                    wform->time2frm((dur-beg)*0.001*5)*0.001,
+//                                                    form->time2frm((dur-beg)*0.001*5)*0.001);
+      AsychronousInsertMusic(file,
+                             decoder[0],
+                             decoder[1],
+                             seekTime,
+                             wform->time2frm((dur-beg)*0.001*5)*0.001,
+                             form->time2frm((dur-beg)*0.001*5)*0.001);
+    }
 }
