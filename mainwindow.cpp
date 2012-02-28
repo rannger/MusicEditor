@@ -541,7 +541,7 @@ void MainWindow::insertMusic()
                              decoder[0],
                              decoder[1],
                              seekTime,
-                             wform->time2frm((dur-beg)*0.001*5)*0.001,
+                             wform->time2frm((beg)*0.001*5)*0.001,
                              form->time2frm((dur-beg)*0.001*5)*0.001);
     }
 }
