@@ -313,7 +313,7 @@ void MainWindow::metaStateChanged(Phonon::State newState, Phonon::State /* oldSt
         musicTable->resizeColumnsToContents();
         musicTable->setColumnWidth(1, 1000);
          musicTable->setColumnWidth(0, 200);
-         musicTable->setRowHeight(currentRow,200);
+         musicTable->setRowHeight(currentRow,100);
     }
 }
 //![15]
@@ -507,7 +507,10 @@ void MainWindow::insertMusic()
     MEAudioDecoder* decoder[2]={NULL,NULL};
 
     if(this->decoders.count()<2)
+    {
+        QMessageBox::warning(this,"insert fail","less than 2 music");
         return;
+    }
 
     QString file = QFileDialog::getSaveFileName(this,tr("save file"),QDesktopServices::storageLocation(QDesktopServices::MusicLocation),
                                                 "Music (*.mp3 *.wav *.wma)");
@@ -536,17 +539,12 @@ void MainWindow::insertMusic()
         param.encodeFrame1=wform->time2frm((beg)*0.001*5)*0.001;
         param.encoderFrame2=form->time2frm((dur-beg)*0.001*5)*0.001;
         param.time=seekTime;
-        QtConcurrent::run(AsychronousInsertMusic,file,param);
-//                                                    file,
-//                                                    decoder,
-//                                                    (seekTime),
-//                                                    wform->time2frm((beg)*0.001*5)*0.001,
-//                                                    form->time2frm((dur-beg)*0.001*5)*0.001);
-//      AsychronousInsertMusic(file,
-//                             decoders[0],
-//                             decoders[1],
-//                             seekTime,
-//                             wform->time2frm((beg)*0.001*5)*0.001,
-//                             form->time2frm((dur-beg)*0.001*5)*0.001);
+        QString content;
+        content.sprintf("%s from %f to %f insert into %s %f",param.decoder1->getFileName().toLocal8Bit().data(),
+                        beg/1000,dur/1000,param.decoder2->getFileName().toLocal8Bit().data(),beg/1000);
+
+        if(QMessageBox::Yes==QMessageBox::information(NULL, "info", content, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes))
+            QtConcurrent::run(AsychronousInsertMusic,file,param);
+
     }
 }

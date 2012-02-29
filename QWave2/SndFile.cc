@@ -68,6 +68,11 @@ namespace QWave2 {
 	if (wave->getPaintDevice()->height() == 0 ||
 	    wave->getPaintDevice()->width() == 0)
 	    return;
+
+        QPainter paint(wave->getPaintDevice());
+        paint.drawLine(0,wave->getHeightPixels() / 2,wave->getWidthPixels(),wave->getHeightPixels() / 2);
+        return;
+
 	int samplerate=this->getSampleRate();
 	int channels=this->getChannels();
 
