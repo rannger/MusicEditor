@@ -530,18 +530,23 @@ void MainWindow::insertMusic()
         decoder[1]=decoders[justPaintRow];
         Waveform* form=waveForms[decoder[1]->getFileName().toLocal8Bit().data()];
         Waveform* wform=waveForms[decoder[0]->getFileName().toLocal8Bit().data()];
-//        QtConcurrent::run(AsychronousInsertMusic,
+        InsterMusicParam param;
+        param.decoder1=decoder[1];
+        param.decoder2=decoder[0];
+        param.encodeFrame1=wform->time2frm((beg)*0.001*5)*0.001;
+        param.encoderFrame2=form->time2frm((dur-beg)*0.001*5)*0.001;
+        param.time=seekTime;
+        QtConcurrent::run(AsychronousInsertMusic,file,param);
 //                                                    file,
-//                                                    decoders[previousRow],
-//                                                    decoders[justPaintRow],
-//                                                    seekTime,
-//                                                    wform->time2frm((dur-beg)*0.001*5)*0.001,
+//                                                    decoder,
+//                                                    (seekTime),
+//                                                    wform->time2frm((beg)*0.001*5)*0.001,
 //                                                    form->time2frm((dur-beg)*0.001*5)*0.001);
-      AsychronousInsertMusic(file,
-                             decoders[0],
-                             decoders[1],
-                             seekTime,
-                             wform->time2frm((beg)*0.001*5)*0.001,
-                             form->time2frm((dur-beg)*0.001*5)*0.001);
+//      AsychronousInsertMusic(file,
+//                             decoders[0],
+//                             decoders[1],
+//                             seekTime,
+//                             wform->time2frm((beg)*0.001*5)*0.001,
+//                             form->time2frm((dur-beg)*0.001*5)*0.001);
     }
 }
