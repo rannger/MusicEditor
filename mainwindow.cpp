@@ -526,7 +526,7 @@ void MainWindow::insertMusic()
             fwrite(&b,sizeof(b),1,fp);
             fclose(fp);
         }
-        decoder[0]=decoders[previousRow];
+        decoder[0]=decoders[previousRow<0?0:previousRow];
         decoder[1]=decoders[justPaintRow];
         Waveform* form=waveForms[decoder[1]->getFileName().toLocal8Bit().data()];
         Waveform* wform=waveForms[decoder[0]->getFileName().toLocal8Bit().data()];
@@ -538,8 +538,8 @@ void MainWindow::insertMusic()
 //                                                    wform->time2frm((dur-beg)*0.001*5)*0.001,
 //                                                    form->time2frm((dur-beg)*0.001*5)*0.001);
       AsychronousInsertMusic(file,
-                             decoder[0],
-                             decoder[1],
+                             decoders[0],
+                             decoders[1],
                              seekTime,
                              wform->time2frm((beg)*0.001*5)*0.001,
                              form->time2frm((dur-beg)*0.001*5)*0.001);
