@@ -51,7 +51,7 @@ signals:
     void updateCursorPosition(Waveform* wave, double beg);
 public slots:
     void showCurve(int num);
-
+    void encoderFinish(int num);
 private slots:
     void addFiles();
     void about();
@@ -104,7 +104,7 @@ private:
     QMap<QString,Waveform*> waveForms;
 public:
     static QFutureWatcher< QVector< short > > *decoderWatcher;
-    static QFutureWatcher<void> *encoderWatcher;
+    static QFutureWatcher<int> *encoderWatcher;
 };
 
 #endif

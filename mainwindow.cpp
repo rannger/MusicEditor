@@ -34,7 +34,7 @@
 using namespace QWave2;
 
 QFutureWatcher< QVector<short> > *MainWindow::decoderWatcher=NULL;
-QFutureWatcher<void> *MainWindow::encoderWatcher=NULL;
+QFutureWatcher<int> *MainWindow::encoderWatcher=NULL;
 //![0]
 MainWindow::MainWindow()
 {
@@ -64,8 +64,9 @@ MainWindow::MainWindow()
     setupMenus();
     setupUi();
     decoderWatcher=new QFutureWatcher< QVector< short > >(this);
-    encoderWatcher=new QFutureWatcher<void>(this);
+    encoderWatcher=new QFutureWatcher<int>(this);
     connect(decoderWatcher,SIGNAL(resultReadyAt(int)),this,SLOT(showCurve(int)));
+    connect(encoderWatcher,SIGNAL(resultReadyAt(int)),this,SLOT(encoderFinish(int)));
     previousRow=-1;
     justPaintRow=-1;
     timeLcd->display("00:00");
@@ -547,4 +548,9 @@ void MainWindow::insertMusic()
             QtConcurrent::run(AsychronousInsertMusic,file,param);
 
     }
+}
+
+void MainWindow::encoderFinish(int num)
+{
+    QMessageBox::information(NULL, "info", "encoder finish", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
 }

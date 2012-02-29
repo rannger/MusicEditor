@@ -31,7 +31,7 @@ struct InsterMusicParam
 };
 
 extern  QVector<short> AsynchronousDecoder(QString file,MEAudioDecoder *decoder);
-extern void AsynchronousEncoder(QString file,MEAudioDecoder *decoder,int64_t time,int frames);
+extern int AsynchronousEncoder(QString file,MEAudioDecoder *decoder,int64_t time,int frames);
 extern void AsychronousInsertMusic(QString file,
                             InsterMusicParam param);
 
