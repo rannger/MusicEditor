@@ -552,5 +552,5 @@ void MainWindow::insertMusic()
 
 void MainWindow::encoderFinish(int num)
 {
-    QMessageBox::information(NULL, "info", "encoder finish", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+    QMessageBox::information(NULL, "info", "encoder finish", QMessageBox::Yes, QMessageBox::Yes);
 }

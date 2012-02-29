@@ -70,7 +70,7 @@ unix{
 
 DEFINES += UNIX
 
-LIBS += -L /usr/lib/ -lqwt-qt4
+LIBS += -L /usr/lib/
 
 
 LIBS += -L/usr/lib -lswscale
