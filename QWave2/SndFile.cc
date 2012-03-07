@@ -68,11 +68,11 @@ namespace QWave2 {
 	if (wave->getPaintDevice()->height() == 0 ||
 	    wave->getPaintDevice()->width() == 0)
 	    return;
-
+/*
         QPainter paint(wave->getPaintDevice());
         paint.drawLine(0,wave->getHeightPixels() / 2,wave->getWidthPixels(),wave->getHeightPixels() / 2);
         return;
-
+*/
 	int samplerate=this->getSampleRate();
 	int channels=this->getChannels();
 
@@ -164,6 +164,9 @@ namespace QWave2 {
 
 	double pps = wave->getPixelsPerSecond();
 	double spp = wave->getSecondsPerPixel();
+	qDebug("spp==%lf",(spp));
+	if(spp<0.5)
+		spp/=1.85;
 	double t0 = wave->getBeginSeconds();
 
 //  qDebug("%f", r);
@@ -194,13 +197,16 @@ namespace QWave2 {
                     for (; f<f1; ++f, p++) {
 			if (min > *p)
 			    min = *p;
-                        if (max < *p)
+                        else if (max < *p)
 			    max = *p;
 		    }
-		    // draw line here!
-                    painter.drawLine(x,(int)(center-h*min),x,(int)(center-h*max));
-                    if(max!=min)
+		    if(max!=min)
+		    {
+			// draw line here!
+                    	painter.drawLine(x,(int)(center-h*min),x,(int)(center-h*max));
+
                         ++x;
+		    }
 		    new_pixel = true;
 		    t1 += spp;
 		    f1 = (int)nearbyint(t1 * samplerate);
