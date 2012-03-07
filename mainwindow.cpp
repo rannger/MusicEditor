@@ -128,6 +128,11 @@ void MainWindow::about()
 
 void MainWindow::translateMusicFormat()
 {
+	if(musicTable->rowCount()==0)
+	{
+		QMessageBox::warning(this,"insert fail","less than 2 music");
+		return;
+	}
     QString file = QFileDialog::getSaveFileName(this,tr("save file"),QDesktopServices::storageLocation(QDesktopServices::MusicLocation),
                                                 "Music (*.mp3 *.wav *.wma)");
 
@@ -346,7 +351,7 @@ void MainWindow::setupActions()
     previousAction = new QAction(style()->standardIcon(QStyle::SP_MediaSkipBackward), tr("Previous"), this);
     previousAction->setShortcut(tr("Ctrl+R"));
     previousAction->setDisabled(true);
-    addFilesAction = new QAction(tr("Import &Files"), this);
+    addFilesAction = new QAction(tr("Import &File"), this);
     addFilesAction->setShortcut(tr("Ctrl+F"));
     exitAction = new QAction(tr("E&xit"), this);
     exitAction->setShortcuts(QKeySequence::Quit);
@@ -354,7 +359,7 @@ void MainWindow::setupActions()
     aboutAction->setShortcut(tr("Ctrl+B"));
     aboutQtAction = new QAction(tr("About &Qt"), this);
     aboutQtAction->setShortcut(tr("Ctrl+Q"));
-    translateAction = new QAction(style()->standardIcon(QStyle::SP_DirClosedIcon),tr("&Export File"),this);
+    translateAction = new QAction(style()->standardIcon(QStyle::SP_DirClosedIcon),tr("&Translate Music"),this);
     insertMusicAction = new QAction(style()->standardIcon(QStyle::SP_DirClosedIcon),tr("&Insert Music"),this);
 
 //![5]
@@ -375,11 +380,15 @@ void MainWindow::setupMenus()
     QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
     fileMenu->addAction(addFilesAction);
     fileMenu->addSeparator();
-    fileMenu->addAction(translateAction);
+    QMenu *exportMenu=new QMenu(tr("&Export File"),menuBar()); 
+
+    fileMenu->addMenu(exportMenu);
+    exportMenu->addAction(translateAction);
+    exportMenu->addAction(insertMusicAction);
     fileMenu->addSeparator();
     fileMenu->addAction(exitAction);
-    QMenu* insertMenu=menuBar()->addMenu(tr("&Insert"));
-    insertMenu->addAction(insertMusicAction);
+//    QMenu* insertMenu=menuBar()->addMenu(tr("&Insert"));
+//    insertMenu->addAction(insertMusicAction);
 
     QMenu *aboutMenu = menuBar()->addMenu(tr("&Help"));
     aboutMenu->addAction(aboutAction);

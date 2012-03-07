@@ -41,7 +41,7 @@ HEADERS  += \
     meaudiodecoder.h \
     debug_string.h \
     ffmpeg.h \
-    AudioData.h \
+#    AudioData.h \
     asynchronous_decode.h \
     QWave2/QWave2/WaveformVRuler.h \
     QWave2/QWave2/WaveformSelectionProxy.h \
