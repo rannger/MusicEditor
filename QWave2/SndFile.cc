@@ -73,6 +73,7 @@ namespace QWave2 {
         paint.drawLine(0,wave->getHeightPixels() / 2,wave->getWidthPixels(),wave->getHeightPixels() / 2);
         return;
 */
+	wave->setBackgroundBrush(QBrush(Qt::white));
 	int samplerate=this->getSampleRate();
 	int channels=this->getChannels();
 
@@ -204,7 +205,7 @@ namespace QWave2 {
 		    {
 			// draw line here!
                     	painter.drawLine(x,(int)(center-h*min),x,(int)(center-h*max));
-
+			//qDebug("%d,%d",(int)(min),(int)(max));
                         ++x;
 		    }
 		    new_pixel = true;
@@ -231,7 +232,6 @@ namespace QWave2 {
 	    {
 		painter.drawLine(x,(int)nearbyint(center-h*min),x,(int)nearbyint(center-h*max));
 	    }
-            qDebug("-----%d",x);
 	}
 	else {
 	    //double x0 = wave->getBeginPixels();

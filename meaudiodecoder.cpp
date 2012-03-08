@@ -107,6 +107,7 @@ int MEAudioDecoder::decoder(QVector< short >& retData)
                         //if(&packet)
                         //samples=(short *)av_fast_realloc(samples,&samples_size,FFMAX(packet.size*sizeof(*samples),AVCODEC_MAX_AUDIO_FRAME_SIZE));
                         samples_size_ptr = AVCODEC_MAX_AUDIO_FRAME_SIZE;
+			memset(samples,0,samples_size_ptr);
                         len = avcodec_decode_audio2(incode_ctx, samples, &samples_size_ptr, pktdata, pktsize);//若为音频包，解码该音频包
 //                                printf("source frame number：%d\n", incode_ctx->frame_number);
                         if(len <0)
@@ -125,8 +126,8 @@ int MEAudioDecoder::decoder(QVector< short >& retData)
 
                             for(int index=0;index<samples_size_ptr;index++)
                             {
-                                int16_t data=samples[index];
-                                retData.push_back(data);
+                                volatile int16_t data=samples[index];
+                                retData.push_back(samples[index]);
                             }
                         }
                 }
