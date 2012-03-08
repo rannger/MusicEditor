@@ -475,7 +475,7 @@ void MainWindow::showCurve(int num)
     sndFile->lengthSeconds=mediaObject->totalTime()/1000;
     QWidget *titleWidget =dynamic_cast<QWidget*>(musicTable->cellWidget(currentRow,0));
 //    QVBoxLayout *titleLayout =dynamic_cast<QVBoxLayout*>(titleWidget->layout());
-    qDebug()<<"Total time:"<<mediaObject->totalTime();
+//    qDebug()<<"Total time:"<<mediaObject->totalTime();
     QGridLayout* grid=MEUnity::unity()->creatWaveFromPanel(sndFile,waveFromWidget,mediaObject->totalTime()/1000*4,this);
     QVBoxLayout* titleLayout=MEUnity::unity()->creatTitlePanel(decoder);
     titleWidget->setLayout(titleLayout);

@@ -232,7 +232,7 @@ int MEAudioDecoder::initWithFile(const QString& fileName)
     //打开输入文件
     if(av_open_input_file(&infmt_ctx, input_file, NULL, 0, NULL)!=0)
     {
-            debug_string("can't open input file\n");
+    //        debug_string("can't open input file\n");
             return -1;
     }
 

@@ -165,7 +165,7 @@ namespace QWave2 {
 
 	double pps = wave->getPixelsPerSecond();
 	double spp = wave->getSecondsPerPixel();
-	qDebug("spp==%lf",(spp));
+
 	if(spp<0.5)
 		spp/=1.85;
 	double t0 = wave->getBeginSeconds();

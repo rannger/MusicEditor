@@ -196,7 +196,6 @@ namespace QWave2 {
 
 	_width = s.width() - 1;
 	_height = s.height() - 1;
-        qDebug("resize width:%d",_width);
 	_canvas.setSceneRect(0,0,_width,_height);
 	//_waves[_waveidx].resize(s);
 	//_waves[!_waveidx].resize(s);
